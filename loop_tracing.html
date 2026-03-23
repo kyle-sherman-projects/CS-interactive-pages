@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔍 Loop Tracing Challenge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0f1117;--surface:#1a1d27;--surface-alt:#222636;--border:#2e3348;
+    --text:#e4e6f0;--text-muted:#8b8fa8;
+    --accent-while:#f59e0b;--accent-while-dim:rgba(245,158,11,.12);
+    --accent-for:#6366f1;--accent-for-dim:rgba(99,102,241,.12);
+    --accent-compare:#10b981;--accent-compare-dim:rgba(16,185,129,.12);
+    --predict:#ec4899;--predict-dim:rgba(236,72,153,.1);
+    --danger:#ef4444;--danger-dim:rgba(239,68,68,.1);
+    --code-bg:#13151f;--radius:10px;
+    --font-body:'DM Sans',sans-serif;--font-code:'JetBrains Mono',monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:16px;line-height:1.65}
+  .hero{background:linear-gradient(135deg,#1a1d27,#1e2235,#1a1d27);border-bottom:1px solid var(--border);padding:2.8rem 2rem 2.2rem;text-align:center}
+  .hero-tag{display:inline-block;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:var(--text-muted);background:var(--surface-alt);border:1px solid var(--border);border-radius:999px;padding:.3rem 1rem;margin-bottom:.8rem}
+  .hero h1{font-size:clamp(1.6rem,3.5vw,2.4rem);font-weight:700;letter-spacing:-.02em;margin-bottom:.3rem}
+  .hero h1 .w{color:var(--accent-while)} .hero h1 .f{color:var(--accent-for)}
+  .hero .subtitle{font-size:1rem;color:var(--text-muted);font-style:italic}
+  .hero .meta{margin-top:1rem;font-size:.82rem;color:var(--text-muted);display:flex;flex-wrap:wrap;justify-content:center;gap:.4rem 1.4rem}
+  .lg-tag{display:inline-block;font-size:.7rem;font-weight:600;letter-spacing:.06em;border-radius:4px;padding:.2rem .6rem}
+  .lg1-tag{background:rgba(31,78,121,.35);color:#7ab8f5;border:1px solid rgba(31,78,121,.5)}
+  .lg3-tag{background:rgba(26,107,60,.35);color:#6dd69c;border:1px solid rgba(26,107,60,.5)}
+  .progress-bar{position:sticky;top:0;z-index:100;background:var(--surface);border-bottom:1px solid var(--border);padding:.5rem 2rem;display:flex;gap:4px}
+  .progress-bar .step{flex:1;height:4px;border-radius:2px;background:var(--border);transition:background .3s}
+  .progress-bar .step.done{background:var(--accent-compare)} .progress-bar .step.active{background:var(--accent-compare);animation:pulse 1.5s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+  .container{max-width:840px;margin:0 auto;padding:2rem 1.5rem 4rem}
+  .section-header{margin:2.5rem 0 1.2rem;padding:1rem 1.5rem;border-radius:var(--radius);border-left:4px solid}
+  .section-header.while{border-color:var(--accent-while);background:var(--accent-while-dim)}
+  .section-header.for{border-color:var(--accent-for);background:var(--accent-for-dim)}
+  .section-header.compare{border-color:var(--accent-compare);background:var(--accent-compare-dim)}
+  .section-header.danger{border-color:var(--danger);background:var(--danger-dim)}
+  .section-header h2{font-size:1.25rem;font-weight:700}
+  .section-header.while h2{color:var(--accent-while)} .section-header.for h2{color:var(--accent-for)}
+  .section-header.compare h2{color:var(--accent-compare)} .section-header.danger h2{color:var(--danger)}
+  .section-header .bilingual{font-size:.82rem;color:var(--text-muted);font-style:italic;margin-top:.1rem}
+  .text-block{margin:1rem 0;font-size:.95rem}
+  code{font-family:var(--font-code);font-size:.85rem;background:var(--code-bg);border:1px solid var(--border);border-radius:4px;padding:.15rem .4rem}
+  .es{color:var(--text-muted);font-style:italic}
+  .code-display{background:var(--code-bg);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.5rem;margin:.8rem 0;font-family:var(--font-code);font-size:.85rem;line-height:1.7;overflow-x:auto}
+  .ln{color:#4a4e69;user-select:none;display:inline-block;width:2rem;text-align:right;margin-right:1rem}
+  .kw{color:#c792ea} .fn{color:#82aaff} .str{color:#c3e88d} .num{color:#f78c6c} .cmt{color:#546e7a;font-style:italic} .var{color:#f59e0b}
+  .code-label{display:flex;align-items:center;gap:.4rem;background:var(--surface-alt);border:1px solid var(--border);border-bottom:none;border-radius:var(--radius) var(--radius) 0 0;padding:.4rem 1rem;font-size:.75rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-top:.8rem}
+  .code-label+.code-display{margin-top:0;border-radius:0 0 var(--radius) var(--radius)}
+  .code-label .copy-hint{margin-left:auto;font-weight:400;font-size:.7rem;color:#5a5e78;text-transform:none;letter-spacing:0}
+  .predict-box{background:var(--predict-dim);border:1px solid rgba(236,72,153,.25);border-radius:var(--radius);padding:1rem 1.5rem;margin:1rem 0}
+  .predict-label{display:flex;align-items:center;gap:.5rem;font-weight:600;font-size:.9rem;color:var(--predict);margin-bottom:.3rem}
+  .predict-sub{font-size:.78rem;color:var(--text-muted);font-style:italic;margin-bottom:.5rem}
+  .predict-box textarea{width:100%;min-height:55px;background:rgba(0,0,0,.3);border:1px solid rgba(236,72,153,.2);border-radius:6px;color:var(--text);font-family:var(--font-code);font-size:.85rem;padding:.7rem;resize:vertical;outline:none}
+  .predict-box textarea:focus{border-color:var(--predict)} .predict-box textarea::placeholder{color:#5a5e78}
+  .action-box{background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.25);border-radius:var(--radius);padding:.8rem 1.2rem;margin:.8rem 0;display:flex;align-items:flex-start;gap:.7rem;font-size:.88rem}
+  .action-box .action-icon{font-size:1.2rem;flex-shrink:0} .action-box strong{color:var(--accent-for)}
+  .reveal-section{margin:.6rem 0 1.2rem}
+  .reveal-btn{background:var(--surface-alt);border:1px solid var(--border);border-radius:6px;color:var(--text-muted);font-family:var(--font-body);font-size:.82rem;font-weight:500;padding:.45rem .9rem;cursor:pointer;transition:all .2s}
+  .reveal-btn:hover{background:var(--border);color:var(--text)}
+  .reveal-content{display:none;margin-top:.5rem;padding:.8rem 1rem;background:var(--surface-alt);border-radius:6px;border:1px solid var(--border);font-size:.88rem}
+  .reveal-content.visible{display:block}
+  .callout{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.5rem;margin:1.2rem 0;position:relative}
+  .callout::before{content:attr(data-icon);position:absolute;top:-.7rem;left:1rem;background:var(--surface);padding:0 .3rem;font-size:1.1rem}
+  .callout-title{font-weight:700;font-size:.85rem;text-transform:uppercase;letter-spacing:.06em;color:var(--accent-compare);margin-bottom:.3rem}
+  .comparison{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1rem 0}
+  @media(max-width:640px){.comparison{grid-template-columns:1fr}}
+  .comparison .col{border-radius:var(--radius);padding:1rem;border:1px solid}
+  .comparison .col.while-col{border-color:rgba(245,158,11,.3);background:var(--accent-while-dim)}
+  .comparison .col.for-col{border-color:rgba(99,102,241,.3);background:var(--accent-for-dim)}
+  .comparison .col h3{font-size:.88rem;font-weight:700;margin-bottom:.5rem}
+  .comparison .col.while-col h3{color:var(--accent-while)} .comparison .col.for-col h3{color:var(--accent-for)}
+  .vocab-table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.88rem}
+  .vocab-table th{background:var(--surface-alt);text-align:left;padding:.6rem 1rem;font-weight:600;border-bottom:2px solid var(--border);color:var(--text-muted);font-size:.78rem;text-transform:uppercase;letter-spacing:.06em}
+  .vocab-table td{padding:.6rem 1rem;border-bottom:1px solid var(--border);vertical-align:top}
+  .checkpoint{display:inline-flex;align-items:center;gap:.4rem;background:var(--accent-compare-dim);border:1px solid rgba(16,185,129,.3);border-radius:999px;padding:.25rem .9rem;font-size:.75rem;font-weight:600;color:var(--accent-compare);margin:1.2rem 0 .4rem}
+  .choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin:.8rem 0}
+  .choice-btn{background:var(--surface-alt);border:2px solid var(--border);border-radius:8px;padding:.7rem 1rem;cursor:pointer;text-align:center;font-weight:600;font-size:.88rem;transition:all .15s;user-select:none}
+  .choice-btn:hover{border-color:var(--text-muted)}
+  .choice-btn.sel-while{border-color:var(--accent-while);background:var(--accent-while-dim);color:var(--accent-while)}
+  .choice-btn.sel-for{border-color:var(--accent-for);background:var(--accent-for-dim);color:var(--accent-for)}
+  .task-num{display:inline-flex;align-items:center;justify-content:center;width:1.6rem;height:1.6rem;border-radius:50%;background:var(--accent-for);color:var(--bg);font-weight:700;font-size:.8rem;margin-right:.4rem}
+  .bug-tag{display:inline-block;background:var(--danger-dim);border:1px solid rgba(239,68,68,.3);color:var(--danger);font-size:.72rem;font-weight:600;border-radius:4px;padding:.15rem .5rem;text-transform:uppercase;letter-spacing:.05em;margin-left:.4rem}
+  .divider{border:none;border-top:1px solid var(--border);margin:2rem 0}
+  .footer-nav{margin-top:2.5rem;padding-top:1.2rem;border-top:1px solid var(--border);text-align:center;color:var(--text-muted);font-size:.85rem}
+
+  .trinket-wrapper{margin:1rem 0;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border)}
+  .trinket-label{background:var(--surface-alt);padding:.5rem 1rem;font-size:.75rem;font-weight:600;color:var(--accent-compare);text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;gap:.4rem}
+  .trinket-label .trinket-dot{width:8px;height:8px;border-radius:50%;background:var(--accent-compare);display:inline-block}
+  .trinket-wrapper iframe{width:100%;height:300px;border:none;display:block;background:#1e1e2e}
+  .trinket-setup{font-size:.72rem;color:#5a5e78;padding:.4rem 1rem;background:var(--code-bg);border-top:1px solid var(--border);font-family:var(--font-code)}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="hero-tag">CS1 · Trimester 3 · Unit 6 · Lesson 2 of 3</div>
+  <h1>🔍 Loop Tracing Challenge</h1>
+  <p class="subtitle">Desafío de Rastreo de Bucles</p>
+  <div class="meta">
+    <span>📅 C Day · 45 min</span>
+    <span class="lg-tag lg1-tag">LG1: Loop Constructs &amp; Pattern Generation</span>
+    <span class="lg-tag lg3-tag">LG3: Master Iterative Processes</span>
+  </div>
+</header>
+<div class="progress-bar"><div class="step" data-section="1"></div><div class="step" data-section="2"></div><div class="step" data-section="3"></div><div class="step" data-section="4"></div></div>
+<div class="container">
+
+<!-- §1 SPEED TRACES -->
+<section data-section="1">
+<div class="section-header compare"><h2>Section 1: Speed Traces (12 min)</h2><div class="bilingual">Sección 1: Rastreos Rápidos</div></div>
+<p class="text-block">Predict output <strong>before</strong> running.</p>
+
+<div class="checkpoint">⚡ Trace 1</div>
+<div class="code-label">📋 Speed Trace 1</div>
+<div class="code-display"><div><span class="ln">1</span><span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="num">3</span>, <span class="num">13</span>, <span class="num">3</span>):</div><div><span class="ln">2</span>    <span class="fn">print</span>(<span class="var">i</span>)</div></div>
+<div class="predict-box"><div class="predict-label">🔮 PREDICT</div><textarea placeholder="Output..."></textarea></div>
+
+<div class="trinket-wrapper">
+  <div class="trinket-label"><span class="trinket-dot"></span> Run it / Córrelo — Code Block L2A</div>
+  <!-- Create at trinket.io/python3 → paste the code → Share → Embed → copy the URL -->
+  <iframe <iframe src="https://trinket.io/embed/python/1b1b518aab1e" width="100%" height="600" frameborder="0" marginwidth="0" marginheight="0" allowfullscreen></iframe>
+  <div class="trinket-setup">Trinket setup: for i in range(3, 13, 3): print(i)</div>
+</div>
+<div class="reveal-section"><button class="reveal-btn" onclick="toggleReveal(this)">Check</button><div class="reveal-content"><p><strong>3, 6, 9, 12</strong></p></div></div>
+
+<div class="checkpoint">⚡ Trace 2</div>
+<div class="code-label">📋 Speed Trace 2</div>
+<div class="code-display"><div><span class="ln">1</span><span class="var">total</span> = <span class="num">0</span></div><div><span class="ln">2</span><span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, <span class="num">5</span>):</div><div><span class="ln">3</span>    <span class="var">total</span> = <span class="var">total</span> + <span class="var">i</span></div><div><span class="ln">4</span><span class="fn">print</span>(<span class="var">total</span>)</div></div>
+<div class="predict-box"><div class="predict-label">🔮 How many lines? What value?</div><textarea placeholder="Output..."></textarea></div>
+
+<div class="trinket-wrapper">
+  <div class="trinket-label"><span class="trinket-dot"></span> Run it / Córrelo — Code Block L2B</div>
+  <!-- Create at trinket.io/python3 → paste the code → Share → Embed → copy the URL -->
+  <iframe <iframe src="https://trinket.io/embed/python/22a682050538" width="100%" height="600" frameborder="0" marginwidth="0" marginheight="0" allowfullscreen></iframe>
+  <div class="trinket-setup">Trinket setup: total = 0 → for i in range(1,5): total += i → print(total) OUTSIDE loop</div>
+</div>
+<div class="reveal-section"><button class="reveal-btn" onclick="toggleReveal(this)">Check</button><div class="reveal-content"><p><strong>10</strong> (one line). print is outside the loop. 0+1+2+3+4 = 10.</p></div></div>
+
+<div class="checkpoint">⚡ Trace 3</div>
+<div class="code-label">📋 Speed Trace 3</div>
+<div class="code-display"><div><span class="ln">1</span><span class="var">n</span> = <span class="num">20</span></div><div><span class="ln">2</span><span class="kw">while</span> <span class="var">n</span> > <span class="num">5</span>:</div><div><span class="ln">3</span>    <span class="var">n</span> = <span class="var">n</span> - <span class="num">4</span></div><div><span class="ln">4</span>    <span class="fn">print</span>(<span class="var">n</span>)</div></div>
+<div class="predict-box"><div class="predict-label">🔮 Careful: subtract BEFORE print</div><textarea placeholder="Output..."></textarea></div>
+
+<div class="trinket-wrapper">
+  <div class="trinket-label"><span class="trinket-dot"></span> Run it / Córrelo — Code Block L2C</div>
+  <!-- Create at trinket.io/python3 → paste the code → Share → Embed → copy the URL -->
+<iframe src="https://trinket.io/embed/python/039a1adc6c03" width="100%" height="600" frameborder="0" marginwidth="0" marginheight="0" allowfullscreen></iframe>
+  <div class="trinket-setup">Trinket setup: n = 20 → while n > 5: n = n - 4, print(n)</div>
+</div>
+<div class="reveal-section"><button class="reveal-btn" onclick="toggleReveal(this)">Check</button><div class="reveal-content"><p><strong>16, 12, 8</strong>. After printing 8, n becomes 4. <code>4 > 5</code> is False → stops.</p></div></div>
+
+<div class="checkpoint">⚡ Trace 4 <span class="lg-tag lg1-tag" style="margin-left:.4rem">LG1</span></div>
+<div class="code-label">📋 Speed Trace 4</div>
+<div class="code-display"><div><span class="ln">1</span><span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="num">5</span>, <span class="num">0</span>, <span class="num">-1</span>):</div><div><span class="ln">2</span>    <span class="fn">print</span>(<span class="str">"*"</span> * <span class="var">i</span>)</div></div>
+<div class="predict-box"><div class="predict-label">🔮 What pattern appears?</div><textarea placeholder="Draw the pattern..."></textarea></div>
+
+<div class="trinket-wrapper">
+  <div class="trinket-label"><span class="trinket-dot"></span> Run it / Córrelo — Code Block L2D</div>
+  <!-- Create at trinket.io/python3 → paste the code → Share → Embed → copy the URL -->
+<iframe src="https://trinket.io/embed/python/716cc373cf8f" width="100%" height="600" frameborder="0" marginwidth="0" marginheight="0" allowfullscreen></iframe>
+  <div class="trinket-setup">Trinket setup: for i in range(5, 0, -1): print('*' * i)</div>
+</div>
+<div class="reveal-section"><button class="reveal-btn" onclick="toggleReveal(this)">Check</button><div class="reveal-content"><div class="code-display" style="line-height:1.3"><div>*****</div><div>****</div><div>***</div><div>**</div><div>*</div></div><p>Inverted triangle — countdown controls the width.</p></div></div>
+</section>
+<hr class="divider">
+
+<!-- §2 WHICH LOOP FITS -->
+<section data-section="2">
+<div class="section-header for"><h2>Section 2: Which Loop Fits? (10 min)</h2><div class="bilingual">Sección 2: ¿Qué Bucle Sirve?</div></div>
+
+<div class="checkpoint">🤔 Scenario 1</div>
+<p class="text-block">Print "Hello" exactly 10 times.</p>
+<div class="choice-grid"><div class="choice-btn" onclick="selectChoice(this,'sel-while')">while</div><div class="choice-btn" onclick="selectChoice(this,'sel-for')">for</div></div>
+<div class="reveal-section"><button class="reveal-btn" onclick="toggleReveal(this)">Check</button><div class="reveal-content"><p><strong>for</strong> — Known count: 10.</p></div></div>
+
+<div class="checkpoint">🤔 Scenario 2</div>
+<p class="text-block">Keep asking for a number until user enters negative.</p>
+<div class="choice-grid"><div class="choice-btn" onclick="selectChoice(this,'sel-while')">while</div><div class="choice-btn" onclick="selectChoice(this,'sel-for')">for</div></div>
+<div class="reveal-section"><button class="reveal-btn" onclick="toggleReveal(this)">Check</button><div class="reveal-content"><p><strong>while</strong> — Unknown iterations, depends on input.</p></div></div>
+
+<div class="checkpoint">🤔 Scenario 3</div>
+<p class="text-block">Print multiples of 7 from 7 to 77.</p>
+<div class="choice-grid"><div class="choice-btn" onclick="selectChoice(this,'sel-while')">while</div><div class="choice-btn" onclick="selectChoice(this,'sel-for')">for</div></div>
+<div class="reveal-section"><button class="reveal-btn" onclick="toggleReveal(this)">Check</button><div class="reveal-content"><p><strong>for</strong> — Known range: <code>range(7, 78, 7)</code>.</p></div></div>
+
+<div class="checkpoint">🤔 Scenario 4</div>
+<p class="text-block">Password checker: 3 attempts max, stop early if correct.</p>
+<div class="choice-grid"><div class="choice-btn" onclick="selectChoice(this,'sel-while')">while</div><div class="choice-btn" onclick="selectChoice(this,'sel-for')">for</div></div>
+<div class="reveal-section"><button class="reveal-btn" onclick="toggleReveal(this)">Check</button><div class="reveal-content"><p><strong>Either!</strong> Known max (for) but early exit needed (while). You'll see this in Password Authenticator.</p></div></div>
+</section>
+<hr class="divider">
+
+<!-- §3 SPOT THE BUG -->
+<section data-section="3">
+<div class="section-header danger"><h2>Section 3: Spot the Bug (12 min)</h2><div class="bilingual">Sección 3: Encuentra el Error</div></div>
+<p class="text-block">Find the bug by reading only. Then verify with Trinket.</p>
+
+<div class="checkpoint">🐛 Bug 1 <span class="bug-tag">Infinite Loop</span></div>
+<div class="code-label">📋 Buggy Code 1</div>
+<div class="code-display"><div><span class="ln">1</span><span class="var">x</span> = <span class="num">10</span></div><div><span class="ln">2</span><span class="kw">while</span> <span class="var">x</span> > <span class="num">0</span>:</div><div><span class="ln">3</span>    <span class="fn">print</span>(<span class="var">x</span>)</div><div><span class="ln">4</span>    <span class="var">x</span> = <span class="var">x</span> + <span class="num">1</span></div></div>
+<div class="predict-box"><div class="predict-label">🔮 What's the bug? How do you fix it?</div><textarea placeholder="The bug is... Fix:"></textarea></div>
+<div class="reveal-section"><button class="reveal-btn" onclick="toggleReveal(this)">Check</button><div class="reveal-content"><p><strong>Bug:</strong> Line 4 adds instead of subtracts. x grows forever. <strong>Fix:</strong> <code>x = x - 1</code></p></div></div>
+
+<div class="checkpoint">🐛 Bug 2 <span class="bug-tag">Off-by-One</span></div>
+<div class="code-label">📋 Goal: print 1 through 10</div>
+<div class="code-display"><div><span class="ln">1</span><span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="num">10</span>):</div><div><span class="ln">2</span>    <span class="fn">print</span>(<span class="var">i</span>)</div></div>
+<div class="predict-box"><div class="predict-label">🔮 What actually prints?</div><textarea placeholder="It prints... should print..."></textarea></div>
+
+<div class="trinket-wrapper">
+  <div class="trinket-label"><span class="trinket-dot"></span> Run it / Córrelo — Code Block L2E</div>
+  <!-- Create at trinket.io/python3 → paste the code → Share → Embed → copy the URL -->
+<iframe src="https://trinket.io/embed/python/df4a47370c05" width="100%" height="600" frameborder="0" marginwidth="0" marginheight="0" allowfullscreen></iframe>
+  <div class="trinket-setup">Trinket setup: for i in range(10): print(i) — shows the off-by-one</div>
+</div>
+<div class="reveal-section"><button class="reveal-btn" onclick="toggleReveal(this)">Check</button><div class="reveal-content"><p><strong>Bug:</strong> Prints 0–9 not 1–10. <strong>Fix:</strong> <code>range(1, 11)</code></p></div></div>
+
+<div class="checkpoint">🐛 Bug 3 <span class="bug-tag">Logic Error</span></div>
+<div class="code-label">📋 Goal: print ONLY the final total of 1+2+3+4+5</div>
+<div class="code-display"><div><span class="ln">1</span><span class="var">total</span> = <span class="num">0</span></div><div><span class="ln">2</span><span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, <span class="num">6</span>):</div><div><span class="ln">3</span>    <span class="var">total</span> = <span class="var">total</span> + <span class="var">i</span></div><div><span class="ln">4</span>    <span class="fn">print</span>(<span class="var">total</span>)</div></div>
+<div class="predict-box"><div class="predict-label">🔮 What prints? Is it correct?</div><textarea placeholder="Output..."></textarea></div>
+
+<div class="trinket-wrapper">
+  <div class="trinket-label"><span class="trinket-dot"></span> Run it / Córrelo — Code Block L2F</div>
+  <!-- Create at trinket.io/python3 → paste the code → Share → Embed → copy the URL -->
+<iframe src="https://trinket.io/embed/python/9dc684a4de30" width="100%" height="600" frameborder="0" marginwidth="0" marginheight="0" allowfullscreen></iframe>
+  <div class="trinket-setup">Trinket setup: total = 0 → for i in range(1,6): total += i, print(total) INSIDE loop</div>
+</div>
+<div class="reveal-section"><button class="reveal-btn" onclick="toggleReveal(this)">Check</button><div class="reveal-content"><p><strong>Bug:</strong> print is inside the loop → prints 1,3,6,10,15. <strong>Fix:</strong> Un-indent print to outside the loop.</p></div></div>
+</section>
+<hr class="divider">
+
+<!-- §4 EXIT TICKET -->
+<section data-section="4">
+<div class="section-header compare"><h2>Section 4: Exit Ticket (8 min)</h2><div class="bilingual">Sección 4: Boleto de Salida</div></div>
+
+<div class="callout" data-icon="🎫"><div class="callout-title">Exit Task 1</div>
+<p class="text-block" style="margin:0">Write a <code>for</code> loop for this pattern:</p>
+<div class="code-display" style="margin:.4rem 0;line-height:1.3"><div>1</div><div>22</div><div>333</div><div>4444</div><div>55555</div></div>
+<p class="text-block es" style="margin:.2rem 0 0">Pista: <code>print(str(i) * i)</code></p></div>
+
+<div class="trinket-wrapper">
+  <div class="trinket-label"><span class="trinket-dot"></span> Run it / Córrelo — Code Block L2G</div>
+  <!-- Create at trinket.io/python3 → paste the code → Share → Embed → copy the URL -->
+<iframe src="https://trinket.io/embed/python/342df814b2c8" width="100%" height="600" frameborder="0" marginwidth="0" marginheight="0" allowfullscreen></iframe>
+  <div class="trinket-setup">Trinket setup: Empty — student writes: for i in range(1,6): print(str(i) * i)</div>
+</div>
+<div class="reveal-section"><button class="reveal-btn" onclick="toggleReveal(this)">Show solution</button><div class="reveal-content"><div class="code-display"><div><span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, <span class="num">6</span>):</div><div>    <span class="fn">print</span>(<span class="fn">str</span>(<span class="var">i</span>) * <span class="var">i</span>)</div></div></div></div>
+
+<div class="callout" data-icon="🎫"><div class="callout-title">Exit Task 2</div>
+<p class="text-block" style="margin:0">Start at 100, keep halving (<code>//</code>) until 0. Print each value.</p></div>
+
+<div class="trinket-wrapper">
+  <div class="trinket-label"><span class="trinket-dot"></span> Run it / Córrelo — Code Block L2H</div>
+  <!-- Create at trinket.io/python3 → paste the code → Share → Embed → copy the URL -->
+<iframe src="https://trinket.io/embed/python/342df814b2c8" width="100%" height="600" frameborder="0" marginwidth="0" marginheight="0" allowfullscreen></iframe>
+  <div class="trinket-setup">Trinket setup: Empty — student writes: n=100, while n>0: print(n), n = n // 2</div>
+</div>
+<div class="reveal-section"><button class="reveal-btn" onclick="toggleReveal(this)">Show solution</button><div class="reveal-content"><div class="code-display"><div><span class="var">n</span> = <span class="num">100</span></div><div><span class="kw">while</span> <span class="var">n</span> > <span class="num">0</span>:</div><div>    <span class="fn">print</span>(<span class="var">n</span>)</div><div>    <span class="var">n</span> = <span class="var">n</span> // <span class="num">2</span></div></div><p>Output: 100, 50, 25, 12, 6, 3, 1.</p></div></div>
+</section>
+
+<div class="footer-nav">
+  <p><strong>Next:</strong> Lesson 3 — Build Your Own Loops (A/B, 80 min)</p>
+</div>
+
+</div>
+
+<script>
+function toggleReveal(btn){const c=btn.nextElementSibling;c.classList.toggle('visible');if(!btn.dataset.o)btn.dataset.o=btn.textContent;btn.textContent=c.classList.contains('visible')?'Hide / Ocultar':btn.dataset.o}
+function selectChoice(el,cls){el.parentElement.querySelectorAll('.choice-btn').forEach(b=>{b.className='choice-btn'});el.classList.add(cls)}
+const sections=document.querySelectorAll('section[data-section]'),steps=document.querySelectorAll('.progress-bar .step');let mx=0;
+const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){const i=parseInt(e.target.dataset.section)-1;if(i>mx)mx=i;steps.forEach((s,j)=>{s.className='step';if(j<mx)s.classList.add('done');else if(j===mx)s.classList.add('active')})}})},{threshold:.3});
+sections.forEach(s=>obs.observe(s));
+</script>
+</body>
+</html>
