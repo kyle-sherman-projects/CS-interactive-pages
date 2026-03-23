@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recipe Program — Step-by-Step Code Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@400;600;800&family=IBM+Plex+Mono:wght@400;600&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #faf6f0;
+  --card: #ffffff;
+  --ink: #2c2418;
+  --muted: #7a705f;
+  --border: #e8e0d4;
+  --input: #1d6fb5;
+  --input-bg: #e6f0fa;
+  --convert: #b85c14;
+  --convert-bg: #fef0dc;
+  --stringop: #0e7a56;
+  --stringop-bg: #dcf5eb;
+  --output: #7b2ea0;
+  --output-bg: #f3e8fa;
+  --math: #c02942;
+  --math-bg: #fce4ea;
+  --shadow: 0 1px 4px rgba(44,36,24,0.06), 0 6px 20px rgba(44,36,24,0.04);
+  --shadow-hover: 0 2px 8px rgba(44,36,24,0.1), 0 12px 32px rgba(44,36,24,0.07);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.6;
+  padding: 1.5rem 1rem 4rem;
+  -webkit-font-smoothing: antialiased;
+}
+
+.page { max-width: 820px; margin: 0 auto; }
+
+/* ===== HEADER ===== */
+.header {
+  text-align: center;
+  padding: 2.5rem 1.5rem 2rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+.header::before {
+  content: '🍳';
+  font-size: 2.8rem;
+  display: block;
+  margin-bottom: 0.5rem;
+  animation: float 3s ease-in-out infinite;
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.header h1 {
+  font-family: 'Bitter', serif;
+  font-weight: 800;
+  font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  margin-bottom: 0.4rem;
+}
+.header h1 span { color: var(--convert); }
+.header .subtitle {
+  font-size: 0.95rem;
+  color: var(--muted);
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+/* ===== LEGEND ===== */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1.2rem;
+  justify-content: center;
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 0.9rem 1.2rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow);
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+.legend-dot {
+  width: 12px; height: 12px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+/* ===== VOCAB ===== */
+.vocab {
+  background: var(--card);
+  border: 1.5px dashed var(--border);
+  border-radius: 12px;
+  padding: 1.1rem 1.4rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow);
+}
+.vocab h3 {
+  font-family: 'Bitter', serif;
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.vocab-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.35rem 1.5rem;
+}
+.vocab-grid p {
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+.vocab-grid code {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.78rem;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+code.c-input   { background: var(--input-bg);   color: var(--input); }
+code.c-conv    { background: var(--convert-bg);  color: var(--convert); }
+code.c-str     { background: var(--stringop-bg); color: var(--stringop); }
+code.c-out     { background: var(--output-bg);   color: var(--output); }
+code.c-math    { background: var(--math-bg);     color: var(--math); }
+
+/* ===== FLOW CONTAINER ===== */
+.flow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+/* Arrow connector */
+.arrow-down {
+  width: 2px;
+  height: 24px;
+  background: #c4bdb2;
+  position: relative;
+}
+.arrow-down::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid #c4bdb2;
+}
+
+/* ===== STEP CARD ===== */
+.step {
+  width: 100%;
+  max-width: 720px;
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 1.3rem 1.5rem 1.2rem;
+  box-shadow: var(--shadow);
+  position: relative;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.step:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+}
+
+/* colored left accent */
+.step::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 12px; bottom: 12px;
+  width: 4px;
+  border-radius: 0 4px 4px 0;
+}
+.step.t-input::before   { background: var(--input); }
+.step.t-convert::before { background: var(--convert); }
+.step.t-stringop::before{ background: var(--stringop); }
+.step.t-output::before  { background: var(--output); }
+.step.t-math::before    { background: var(--math); }
+.step.t-combo::before   { background: linear-gradient(180deg, var(--input), var(--convert)); }
+.step.t-start::before   { background: var(--ink); }
+.step.t-end::before     { background: var(--ink); }
+
+/* Tag pill */
+.tag {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 2px 8px;
+  border-radius: 5px;
+  color: white;
+  margin-bottom: 0.4rem;
+}
+.tag-input   { background: var(--input); }
+.tag-convert { background: var(--convert); }
+.tag-stringop{ background: var(--stringop); }
+.tag-output  { background: var(--output); }
+.tag-math    { background: var(--math); }
+.tag-start   { background: var(--ink); }
+
+.step-title {
+  font-family: 'Bitter', serif;
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 0.3rem;
+}
+
+.step-explain {
+  font-size: 0.88rem;
+  color: var(--muted);
+  margin-bottom: 0.6rem;
+}
+.step-explain .es {
+  font-style: italic;
+  color: #9a8e7a;
+  font-size: 0.82rem;
+}
+
+/* Code block inside step */
+.code-block {
+  background: #1e1e2e;
+  color: #cdd6f4;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.8rem;
+  line-height: 1.7;
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin-bottom: 0.5rem;
+  position: relative;
+}
+.code-block .line-num {
+  color: #585b70;
+  user-select: none;
+  margin-right: 1em;
+}
+.hl-input   { color: #89b4fa; font-weight: 600; }
+.hl-convert { color: #fab387; font-weight: 600; }
+.hl-string  { color: #a6e3a1; }
+.hl-stringop{ color: #a6e3a1; font-weight: 600; }
+.hl-var     { color: #cdd6f4; }
+.hl-comment { color: #6c7086; font-style: italic; }
+.hl-output  { color: #cba6f7; font-weight: 600; }
+.hl-math    { color: #f38ba8; font-weight: 600; }
+.hl-keyword { color: #cba6f7; }
+.hl-str-content { color: #a6e3a1; }
+
+/* Breakdown box */
+.breakdown {
+  background: #fdfcfa;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.7rem 0.9rem;
+  margin-top: 0.4rem;
+}
+.breakdown-title {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.3rem;
+  color: var(--muted);
+}
+.breakdown p {
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+.breakdown .arrow-text {
+  color: var(--convert);
+  font-weight: 700;
+}
+
+/* Repeat bracket */
+.repeat-section {
+  width: 100%;
+  max-width: 720px;
+  border: 2px dashed #c4bdb2;
+  border-radius: 14px;
+  padding: 1rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  position: relative;
+}
+.repeat-label {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg);
+  padding: 0 12px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/* Sample run box */
+.sample-run {
+  width: 100%;
+  max-width: 720px;
+  background: #1e1e2e;
+  border-radius: 14px;
+  padding: 1.3rem 1.5rem;
+  box-shadow: var(--shadow);
+  margin-top: 0.5rem;
+}
+.sample-run h3 {
+  font-family: 'Bitter', serif;
+  color: #cdd6f4;
+  font-size: 0.95rem;
+  margin-bottom: 0.7rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.sample-run pre {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.78rem;
+  line-height: 1.8;
+  color: #a6adc8;
+}
+.sample-run .user-in {
+  color: #89b4fa;
+  font-weight: 600;
+}
+.sample-run .prog-out {
+  color: #a6e3a1;
+}
+
+/* ===== SUMMARY ===== */
+.summary {
+  width: 100%;
+  max-width: 720px;
+  background: var(--card);
+  border: 2px solid var(--ink);
+  border-radius: 14px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+  margin-top: 0.5rem;
+}
+.summary h3 {
+  font-family: 'Bitter', serif;
+  font-size: 1.1rem;
+  margin-bottom: 0.7rem;
+  display: flex; align-items: center; gap: 8px;
+}
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.7rem;
+}
+.summary-card {
+  border-radius: 10px;
+  padding: 0.8rem 1rem;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+.summary-card h4 {
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+}
+.sc-input   { background: var(--input-bg);   border-left: 3px solid var(--input); }
+.sc-input h4   { color: var(--input); }
+.sc-conv    { background: var(--convert-bg);  border-left: 3px solid var(--convert); }
+.sc-conv h4    { color: var(--convert); }
+.sc-str     { background: var(--stringop-bg); border-left: 3px solid var(--stringop); }
+.sc-str h4     { color: var(--stringop); }
+.sc-out     { background: var(--output-bg);   border-left: 3px solid var(--output); }
+.sc-out h4     { color: var(--output); }
+
+/* ===== ANIMATION ===== */
+.step, .repeat-section, .sample-run, .summary {
+  opacity: 0;
+  transform: translateY(16px);
+  animation: fadeUp 0.4s ease forwards;
+}
+@keyframes fadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+.flow > *:nth-child(1)  { animation-delay: 0.05s; }
+.flow > *:nth-child(2)  { animation-delay: 0.08s; }
+.flow > *:nth-child(3)  { animation-delay: 0.11s; }
+.flow > *:nth-child(4)  { animation-delay: 0.14s; }
+.flow > *:nth-child(5)  { animation-delay: 0.17s; }
+.flow > *:nth-child(6)  { animation-delay: 0.20s; }
+.flow > *:nth-child(7)  { animation-delay: 0.23s; }
+.flow > *:nth-child(8)  { animation-delay: 0.26s; }
+.flow > *:nth-child(9)  { animation-delay: 0.29s; }
+.flow > *:nth-child(10) { animation-delay: 0.32s; }
+.flow > *:nth-child(11) { animation-delay: 0.35s; }
+.flow > *:nth-child(12) { animation-delay: 0.38s; }
+.flow > *:nth-child(13) { animation-delay: 0.41s; }
+.flow > *:nth-child(14) { animation-delay: 0.44s; }
+.flow > *:nth-child(15) { animation-delay: 0.47s; }
+.flow > *:nth-child(16) { animation-delay: 0.50s; }
+.flow > *:nth-child(17) { animation-delay: 0.53s; }
+.flow > *:nth-child(18) { animation-delay: 0.56s; }
+.flow > *:nth-child(19) { animation-delay: 0.59s; }
+.flow > *:nth-child(20) { animation-delay: 0.62s; }
+
+@media (max-width: 600px) {
+  .step { padding: 1rem 1.1rem 0.9rem; }
+  .code-block { font-size: 0.72rem; padding: 0.6rem 0.8rem; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <h1>Recipe Program <span>Step-by-Step</span></h1>
+    <p class="subtitle">How Python uses input, type conversion, and string operators to build an interactive recipe calculator.</p>
+  </div>
+
+  <!-- LEGEND -->
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--input)"></div> User Input</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--convert)"></div> Type Conversion</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--stringop)"></div> String Operator (+)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--math)"></div> Math Operator (*)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--output)"></div> Output (print)</div>
+  </div>
+
+  <!-- VOCAB -->
+  <div class="vocab">
+    <h3>📖 Key Vocabulary / Vocabulario Clave</h3>
+    <div class="vocab-grid">
+      <p><code class="c-input">input()</code> — Asks the user to type something / <em>Pide al usuario que escriba algo</em></p>
+      <p><code class="c-conv">float()</code> — Converts text → decimal number / <em>Convierte texto → número decimal</em></p>
+      <p><code class="c-conv">int()</code> — Converts text → whole number / <em>Convierte texto → número entero</em></p>
+      <p><code class="c-conv">str()</code> — Converts number → text / <em>Convierte número → texto</em></p>
+      <p><code class="c-str">+</code> (strings) — Joins text together / <em>Une textos</em></p>
+      <p><code class="c-math">*</code> (numbers) — Multiplies numbers / <em>Multiplica números</em></p>
+    </div>
+  </div>
+
+  <!-- FLOWCHART -->
+  <div class="flow">
+
+    <!-- STEP 0: START -->
+    <div class="step t-start">
+      <span class="tag tag-start">Start</span>
+      <div class="step-title">📝 Program Purpose</div>
+      <div class="step-explain">
+        This program calculates total ingredient amounts based on servings.
+        <br><span class="es">Este programa calcula la cantidad total de ingredientes según las porciones.</span>
+      </div>
+      <div class="code-block">
+        <span class="hl-comment">"""<br>This program asks the user for three ingredients,<br>three amounts, and a number of servings, and<br>determines how much of each ingredient is needed<br>to serve the specified number of servings.<br>"""</span>
+      </div>
+    </div>
+
+    <div class="arrow-down"></div>
+
+    <!-- REPEAT BRACKET: Ingredients 1-3 -->
+    <div class="repeat-section">
+      <div class="repeat-label">🔁 REPEAT FOR EACH INGREDIENT (×3) / REPETIR PARA CADA INGREDIENTE</div>
+
+      <!-- STEP 1: Get ingredient name -->
+      <div class="step t-input" style="max-width:680px; margin-top:0.8rem;">
+        <span class="tag tag-input">User Input</span>
+        <div class="step-title">Step 1 — Get Ingredient Name</div>
+        <div class="step-explain">
+          Ask the user to type an ingredient name. Python saves it as a <strong>string</strong> (text).
+          <br><span class="es">Pedir al usuario el nombre del ingrediente. Python lo guarda como texto (string).</span>
+        </div>
+        <div class="code-block">
+          <span class="hl-var">ingredient_1</span> = <span class="hl-input">input(</span><span class="hl-string">"Enter ingredient 1: "</span><span class="hl-input">)</span>
+        </div>
+        <div class="breakdown">
+          <div class="breakdown-title">What happens</div>
+          <p>User types: <strong>flour</strong> → <code class="c-input">ingredient_1</code> now holds <code class="c-str">"flour"</code> (a string)</p>
+        </div>
+      </div>
+
+      <div class="arrow-down"></div>
+
+      <!-- STEP 2: Get ounces with conversion + string concat -->
+      <div class="step t-combo" style="max-width:680px;">
+        <span class="tag tag-input" style="margin-right:3px;">Input</span>
+        <span class="tag tag-convert" style="margin-right:3px;">Type Conversion</span>
+        <span class="tag tag-stringop">String +</span>
+        <div class="step-title">Step 2 — Get Ounces (3 Concepts in 1 Line!)</div>
+        <div class="step-explain">
+          This line does three things at once. Let's break it apart.
+          <br><span class="es">Esta línea hace tres cosas a la vez. Vamos a separarla.</span>
+        </div>
+        <div class="code-block">
+          <span class="hl-var">ingredient_1_ounces</span> = <span class="hl-convert">float(</span><span class="hl-input">input(</span><span class="hl-string">"Enter ounces for "</span> <span class="hl-stringop">+</span> <span class="hl-var">ingredient_1</span> <span class="hl-stringop">+</span> <span class="hl-string">". "</span><span class="hl-input">)</span><span class="hl-convert">)</span>
+        </div>
+        <div class="breakdown">
+          <div class="breakdown-title">🔍 Breaking it down — inside → outside</div>
+          <p>
+            <strong>1.</strong> <code class="c-str">"Enter ounces for " <strong>+</strong> ingredient_1 <strong>+</strong> ". "</code>
+            <br>&nbsp;&nbsp;&nbsp;String operator <code class="c-str">+</code> joins text → <code class="c-str">"Enter ounces for flour. "</code>
+          </p>
+          <p style="margin-top:4px;">
+            <strong>2.</strong> <code class="c-input">input(...)</code> shows that message and waits → user types <strong>2.5</strong> → returns <code class="c-str">"2.5"</code> (still a string!)
+          </p>
+          <p style="margin-top:4px;">
+            <strong>3.</strong> <code class="c-conv">float(...)</code> converts <code class="c-str">"2.5"</code> <span class="arrow-text">→</span> <code class="c-conv">2.5</code> (now a decimal number we can use in math)
+          </p>
+        </div>
+      </div>
+
+      <div class="arrow-down"></div>
+      <div style="font-size:0.78rem; color:var(--muted); font-weight:700; padding:0.2rem 0;">↕ Steps 1–2 repeat for ingredients 2 and 3</div>
+
+    </div><!-- end repeat section -->
+
+    <div class="arrow-down"></div>
+
+    <!-- STEP 3: Get servings -->
+    <div class="step t-combo">
+      <span class="tag tag-input" style="margin-right:3px;">Input</span>
+      <span class="tag tag-convert">Type Conversion</span>
+      <div class="step-title">Step 3 — Get Number of Servings</div>
+      <div class="step-explain">
+        Ask how many servings. Convert to <strong>integer</strong> (whole number) since you can't have 2.5 servings in this recipe.
+        <br><span class="es">Preguntar cuántas porciones. Convertir a entero (número entero) porque no puedes tener 2.5 porciones.</span>
+      </div>
+      <div class="code-block">
+        <span class="hl-var">num_servings</span> = <span class="hl-convert">int(</span><span class="hl-input">input(</span><span class="hl-string">"Number of servings: "</span><span class="hl-input">)</span><span class="hl-convert">)</span>
+      </div>
+      <div class="breakdown">
+        <div class="breakdown-title">What happens</div>
+        <p>User types: <strong>4</strong> → <code class="c-input">input()</code> returns <code class="c-str">"4"</code> (string) → <code class="c-conv">int()</code> converts to <code class="c-conv">4</code> (integer)</p>
+        <p style="margin-top:4px;"><strong>Why int() not float()?</strong> Servings are whole numbers. <code class="c-conv">int()</code> = whole, <code class="c-conv">float()</code> = decimal.</p>
+      </div>
+    </div>
+
+    <div class="arrow-down"></div>
+
+    <!-- STEP 4: Calculate & Print -->
+    <div class="step t-output">
+      <span class="tag tag-math" style="margin-right:3px;">Math *</span>
+      <span class="tag tag-convert" style="margin-right:3px;">str()</span>
+      <span class="tag tag-stringop" style="margin-right:3px;">String +</span>
+      <span class="tag tag-output">Output</span>
+      <div class="step-title">Step 4 — Calculate & Display Results</div>
+      <div class="step-explain">
+        The most complex line: multiply, convert the answer to text, join it all together, and print.
+        <br><span class="es">La línea más compleja: multiplicar, convertir la respuesta a texto, unir todo e imprimir.</span>
+      </div>
+      <div class="code-block">
+        <span class="hl-output">print(</span><span class="hl-string">"Total ounces of "</span> <span class="hl-stringop">+</span> <span class="hl-var">ingredient_1</span> <span class="hl-stringop">+</span> <span class="hl-string">": "</span> <span class="hl-stringop">+</span> <span class="hl-convert">str(</span><span class="hl-var">ingredient_1_ounces</span> <span class="hl-math">*</span> <span class="hl-var">num_servings</span><span class="hl-convert">)</span><span class="hl-output">)</span>
+      </div>
+      <div class="breakdown">
+        <div class="breakdown-title">🔍 Breaking it down — inside → outside</div>
+        <p>
+          <strong>1.</strong> <code class="c-math">ingredient_1_ounces * num_servings</code>
+          <br>&nbsp;&nbsp;&nbsp;Math: <code class="c-math">2.5 * 4</code> = <code class="c-math">10.0</code> (a float number)
+        </p>
+        <p style="margin-top:4px;">
+          <strong>2.</strong> <code class="c-conv">str(10.0)</code>
+          <br>&nbsp;&nbsp;&nbsp;Convert number <span class="arrow-text">→</span> string: <code class="c-str">"10.0"</code> (now it's text — we need this to use <code class="c-str">+</code> with other strings!)
+        </p>
+        <p style="margin-top:4px;">
+          <strong>3.</strong> <code class="c-str">"Total ounces of " + "flour" + ": " + "10.0"</code>
+          <br>&nbsp;&nbsp;&nbsp;String <code class="c-str">+</code> joins all text → <code class="c-str">"Total ounces of flour: 10.0"</code>
+        </p>
+        <p style="margin-top:4px;">
+          <strong>4.</strong> <code class="c-out">print(...)</code> displays the result on screen.
+        </p>
+      </div>
+      <div class="breakdown" style="margin-top:6px; border-color: var(--math); border-left: 3px solid var(--math);">
+        <div class="breakdown-title" style="color:var(--math);">⚠️ Why do we need str() here?</div>
+        <p>
+          Python cannot use <code class="c-str">+</code> to join a <strong>string</strong> and a <strong>number</strong>. You'll get a <code style="background:#fce4ea; color:var(--math);">TypeError</code>!
+          <br>We must convert the number to text first with <code class="c-conv">str()</code>.
+          <br><span style="color:#9a8e7a; font-style:italic;">Python no puede usar + para unir texto con número. ¡Primero convierte con str()!</span>
+        </p>
+      </div>
+    </div>
+
+    <div class="arrow-down"></div>
+
+    <!-- SAMPLE RUN -->
+    <div class="sample-run">
+      <h3>💻 Sample Run / Ejecución de Ejemplo</h3>
+      <pre><span class="prog-out">Enter ingredient 1: </span><span class="user-in">flour</span>
+<span class="prog-out">Enter ounces for flour. </span><span class="user-in">2.5</span>
+<span class="prog-out">Enter ingredient 2: </span><span class="user-in">sugar</span>
+<span class="prog-out">Enter ounces for sugar. </span><span class="user-in">1.0</span>
+<span class="prog-out">Enter ingredient 3: </span><span class="user-in">butter</span>
+<span class="prog-out">Enter ounces for butter. </span><span class="user-in">3.0</span>
+<span class="prog-out">Number of servings: </span><span class="user-in">4</span>
+<span class="prog-out">Total ounces of flour: 10.0</span>
+<span class="prog-out">Total ounces of sugar: 4.0</span>
+<span class="prog-out">Total ounces of butter: 12.0</span></pre>
+    </div>
+
+    <div class="arrow-down"></div>
+
+    <!-- SUMMARY -->
+    <div class="summary">
+      <h3>🧠 Key Concepts Summary / Resumen de Conceptos Clave</h3>
+      <div class="summary-grid">
+        <div class="summary-card sc-input">
+          <h4>User Input</h4>
+          <code class="c-input">input()</code> always returns a <strong>string</strong>, even if the user types a number.
+          <br><em style="color:#9a8e7a; font-size:0.78rem;">input() siempre devuelve texto.</em>
+        </div>
+        <div class="summary-card sc-conv">
+          <h4>Type Conversion</h4>
+          <code class="c-conv">float()</code> → decimal number
+          <br><code class="c-conv">int()</code> → whole number
+          <br><code class="c-conv">str()</code> → text
+          <br><em style="color:#9a8e7a; font-size:0.78rem;">Cambiar el tipo de dato.</em>
+        </div>
+        <div class="summary-card sc-str">
+          <h4>String Operator +</h4>
+          Joins text together. Both sides <strong>must be strings</strong>.
+          <br><code class="c-str">"hi" + "there"</code> → <code class="c-str">"hithere"</code>
+          <br><em style="color:#9a8e7a; font-size:0.78rem;">Une textos. Ambos lados deben ser strings.</em>
+        </div>
+        <div class="summary-card sc-out">
+          <h4>Common Error</h4>
+          <code style="background:#fce4ea;color:var(--math);">TypeError</code> when you mix string + number. Fix: wrap the number in <code class="c-conv">str()</code>.
+          <br><em style="color:#9a8e7a; font-size:0.78rem;">Error común: mezclar texto + número. Solución: usar str().</em>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end flow -->
+</div>
+</body>
+</html>
