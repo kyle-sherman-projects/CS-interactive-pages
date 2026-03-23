@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Two Ways to Repeat: <span class="w">while</span> &amp; <span class="f">for</span></title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0f1117;--surface:#1a1d27;--surface-alt:#222636;--border:#2e3348;
+    --text:#e4e6f0;--text-muted:#8b8fa8;
+    --accent-while:#f59e0b;--accent-while-dim:rgba(245,158,11,.12);
+    --accent-for:#6366f1;--accent-for-dim:rgba(99,102,241,.12);
+    --accent-compare:#10b981;--accent-compare-dim:rgba(16,185,129,.12);
+    --predict:#ec4899;--predict-dim:rgba(236,72,153,.1);
+    --danger:#ef4444;--danger-dim:rgba(239,68,68,.1);
+    --code-bg:#13151f;--radius:10px;
+    --font-body:'DM Sans',sans-serif;--font-code:'JetBrains Mono',monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:16px;line-height:1.65}
+  .hero{background:linear-gradient(135deg,#1a1d27,#1e2235,#1a1d27);border-bottom:1px solid var(--border);padding:2.8rem 2rem 2.2rem;text-align:center}
+  .hero-tag{display:inline-block;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:var(--text-muted);background:var(--surface-alt);border:1px solid var(--border);border-radius:999px;padding:.3rem 1rem;margin-bottom:.8rem}
+  .hero h1{font-size:clamp(1.6rem,3.5vw,2.4rem);font-weight:700;letter-spacing:-.02em;margin-bottom:.3rem}
+  .hero h1 .w{color:var(--accent-while)} .hero h1 .f{color:var(--accent-for)}
+  .hero .subtitle{font-size:1rem;color:var(--text-muted);font-style:italic}
+  .hero .meta{margin-top:1rem;font-size:.82rem;color:var(--text-muted);display:flex;flex-wrap:wrap;justify-content:center;gap:.4rem 1.4rem}
+  .lg-tag{display:inline-block;font-size:.7rem;font-weight:600;letter-spacing:.06em;border-radius:4px;padding:.2rem .6rem}
+  .lg1-tag{background:rgba(31,78,121,.35);color:#7ab8f5;border:1px solid rgba(31,78,121,.5)}
+  .lg3-tag{background:rgba(26,107,60,.35);color:#6dd69c;border:1px solid rgba(26,107,60,.5)}
+  .progress-bar{position:sticky;top:0;z-index:100;background:var(--surface);border-bottom:1px solid var(--border);padding:.5rem 2rem;display:flex;gap:4px}
+  .progress-bar .step{flex:1;height:4px;border-radius:2px;background:var(--border);transition:background .3s}
+  .progress-bar .step.done{background:var(--accent-compare)} .progress-bar .step.active{background:var(--accent-compare);animation:pulse 1.5s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+  .container{max-width:840px;margin:0 auto;padding:2rem 1.5rem 4rem}
+  .section-header{margin:2.5rem 0 1.2rem;padding:1rem 1.5rem;border-radius:var(--radius);border-left:4px solid}
+  .section-header.while{border-color:var(--accent-while);background:var(--accent-while-dim)}
+  .section-header.for{border-color:var(--accent-for);background:var(--accent-for-dim)}
+  .section-header.compare{border-color:var(--accent-compare);background:var(--accent-compare-dim)}
+  .section-header.danger{border-color:var(--danger);background:var(--danger-dim)}
+  .section-header h2{font-size:1.25rem;font-weight:700}
+  .section-header.while h2{color:var(--accent-while)} .section-header.for h2{color:var(--accent-for)}
+  .section-header.compare h2{color:var(--accent-compare)} .section-header.danger h2{color:var(--danger)}
+  .section-header .bilingual{font-size:.82rem;color:var(--text-muted);font-style:italic;margin-top:.1rem}
+  .text-block{margin:1rem 0;font-size:.95rem}
+  code{font-family:var(--font-code);font-size:.85rem;background:var(--code-bg);border:1px solid var(--border);border-radius:4px;padding:.15rem .4rem}
+  .es{color:var(--text-muted);font-style:italic}
+  .code-display{background:var(--code-bg);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.5rem;margin:.8rem 0;font-family:var(--font-code);font-size:.85rem;line-height:1.7;overflow-x:auto}
+  .ln{color:#4a4e69;user-select:none;display:inline-block;width:2rem;text-align:right;margin-right:1rem}
+  .kw{color:#c792ea} .fn{color:#82aaff} .str{color:#c3e88d} .num{color:#f78c6c} .cmt{color:#546e7a;font-style:italic} .var{color:#f59e0b}
+  .code-label{display:flex;align-items:center;gap:.4rem;background:var(--surface-alt);border:1px solid var(--border);border-bottom:none;border-radius:var(--radius) var(--radius) 0 0;padding:.4rem 1rem;font-size:.75rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-top:.8rem}
+  .code-label+.code-display{margin-top:0;border-radius:0 0 var(--radius) var(--radius)}
+  .code-label .copy-hint{margin-left:auto;font-weight:400;font-size:.7rem;color:#5a5e78;text-transform:none;letter-spacing:0}
+  .predict-box{background:var(--predict-dim);border:1px solid rgba(236,72,153,.25);border-radius:var(--radius);padding:1rem 1.5rem;margin:1rem 0}
+  .predict-label{display:flex;align-items:center;gap:.5rem;font-weight:600;font-size:.9rem;color:var(--predict);margin-bottom:.3rem}
+  .predict-sub{font-size:.78rem;color:var(--text-muted);font-style:italic;margin-bottom:.5rem}
+  .predict-box textarea{width:100%;min-height:55px;background:rgba(0,0,0,.3);border:1px solid rgba(236,72,153,.2);border-radius:6px;color:var(--text);font-family:var(--font-code);font-size:.85rem;padding:.7rem;resize:vertical;outline:none}
+  .predict-box textarea:focus{border-color:var(--predict)} .predict-box textarea::placeholder{color:#5a5e78}
+  .action-box{background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.25);border-radius:var(--radius);padding:.8rem 1.2rem;margin:.8rem 0;display:flex;align-items:flex-start;gap:.7rem;font-size:.88rem}
+  .action-box .action-icon{font-size:1.2rem;flex-shrink:0} .action-box strong{color:var(--accent-for)}
+  .reveal-section{margin:.6rem 0 1.2rem}
+  .reveal-btn{background:var(--surface-alt);border:1px solid var(--border);border-radius:6px;color:var(--text-muted);font-family:var(--font-body);font-size:.82rem;font-weight:500;padding:.45rem .9rem;cursor:pointer;transition:all .2s}
+  .reveal-btn:hover{background:var(--border);color:var(--text)}
+  .reveal-content{display:none;margin-top:.5rem;padding:.8rem 1rem;background:var(--surface-alt);border-radius:6px;border:1px solid var(--border);font-size:.88rem}
+  .reveal-content.visible{display:block}
+  .callout{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.5rem;margin:1.2rem 0;position:relative}
+  .callout::before{content:attr(data-icon);position:absolute;top:-.7rem;left:1rem;background:var(--surface);padding:0 .3rem;font-size:1.1rem}
+  .callout-title{font-weight:700;font-size:.85rem;text-transform:uppercase;letter-spacing:.06em;color:var(--accent-compare);margin-bottom:.3rem}
+  .comparison{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1rem 0}
+  @media(max-width:640px){.comparison{grid-template-columns:1fr}}
+  .comparison .col{border-radius:var(--radius);padding:1rem;border:1px solid}
+  .comparison .col.while-col{border-color:rgba(245,158,11,.3);background:var(--accent-while-dim)}
+  .comparison .col.for-col{border-color:rgba(99,102,241,.3);background:var(--accent-for-dim)}
+  .comparison .col h3{font-size:.88rem;font-weight:700;margin-bottom:.5rem}
+  .comparison .col.while-col h3{color:var(--accent-while)} .comparison .col.for-col h3{color:var(--accent-for)}
+  .vocab-table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.88rem}
+  .vocab-table th{background:var(--surface-alt);text-align:left;padding:.6rem 1rem;font-weight:600;border-bottom:2px solid var(--border);color:var(--text-muted);font-size:.78rem;text-transform:uppercase;letter-spacing:.06em}
+  .vocab-table td{padding:.6rem 1rem;border-bottom:1px solid var(--border);vertical-align:top}
+  .checkpoint{display:inline-flex;align-items:center;gap:.4rem;background:var(--accent-compare-dim);border:1px solid rgba(16,185,129,.3);border-radius:999px;padding:.25rem .9rem;font-size:.75rem;font-weight:600;color:var(--accent-compare);margin:1.2rem 0 .4rem}
+  .choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin:.8rem 0}
+  .choice-btn{background:var(--surface-alt);border:2px solid var(--border);border-radius:8px;padding:.7rem 1rem;cursor:pointer;text-align:center;font-weight:600;font-size:.88rem;transition:all .15s;user-select:none}
+  .choice-btn:hover{border-color:var(--text-muted)}
+  .choice-btn.sel-while{border-color:var(--accent-while);background:var(--accent-while-dim);color:var(--accent-while)}
+  .choice-btn.sel-for{border-color:var(--accent-for);background:var(--accent-for-dim);color:var(--accent-for)}
+  .task-num{display:inline-flex;align-items:center;justify-content:center;width:1.6rem;height:1.6rem;border-radius:50%;background:var(--accent-for);color:var(--bg);font-weight:700;font-size:.8rem;margin-right:.4rem}
+  .bug-tag{display:inline-block;background:var(--danger-dim);border:1px solid rgba(239,68,68,.3);color:var(--danger);font-size:.72rem;font-weight:600;border-radius:4px;padding:.15rem .5rem;text-transform:uppercase;letter-spacing:.05em;margin-left:.4rem}
+  .divider{border:none;border-top:1px solid var(--border);margin:2rem 0}
+  .footer-nav{margin-top:2.5rem;padding-top:1.2rem;border-top:1px solid var(--border);text-align:center;color:var(--text-muted);font-size:.85rem}
+
+  .trinket-wrapper{margin:1rem 0;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border)}
+  .trinket-label{background:var(--surface-alt);padding:.5rem 1rem;font-size:.75rem;font-weight:600;color:var(--accent-compare);text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;gap:.4rem}
+  .trinket-label .trinket-dot{width:8px;height:8px;border-radius:50%;background:var(--accent-compare);display:inline-block}
+  .trinket-wrapper iframe{width:100%;height:300px;border:none;display:block;background:#1e1e2e}
+  .trinket-setup{font-size:.72rem;color:#5a5e78;padding:.4rem 1rem;background:var(--code-bg);border-top:1px solid var(--border);font-family:var(--font-code)}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="hero-tag">CS1 · Trimester 3 · Unit 6 · Lesson 1 of 3</div>
+  <h1>Two Ways to Repeat: <span class="w">while</span> &amp; <span class="f">for</span></h1>
+  <p class="subtitle">Dos Formas de Repetir: while y for</p>
+  <div class="meta">
+    <span>📅 A/B Block · 80 min</span>
+    <span class="lg-tag lg1-tag">LG1: Loop Constructs &amp; Pattern Generation</span>
+    <span class="lg-tag lg3-tag">LG3: Master Iterative Processes</span>
+  </div>
+</header>
+<div class="progress-bar"><div class="step" data-section="1"></div><div class="step" data-section="2"></div><div class="step" data-section="3"></div><div class="step" data-section="4"></div><div class="step" data-section="5"></div><div class="step" data-section="6"></div><div class="step" data-section="7"></div></div>
+<div class="container">
+
+<!-- §1 VOCAB -->
+<section data-section="1">
+<div class="section-header compare"><h2>Section 1: Key Vocabulary</h2><div class="bilingual">Sección 1: Vocabulario Clave</div></div>
+<p class="text-block">Review these terms before you start.</p>
+<table class="vocab-table">
+<thead><tr><th>Term / Término</th><th>Definition / Definición</th><th>Example / Ejemplo</th></tr></thead>
+<tbody>
+<tr><td><strong>Loop</strong><br><span class="es">Bucle</span></td><td>Code that repeats.<br><span class="es">Código que se repite.</span></td><td><code>for i in range(5):</code></td></tr>
+<tr><td><strong>Iteration</strong><br><span class="es">Iteración</span></td><td>One single pass through the loop body.<br><span class="es">Una pasada por el cuerpo del bucle.</span></td><td>5 iterations = runs 5 times</td></tr>
+<tr><td><strong>Condition</strong><br><span class="es">Condición</span></td><td>A test: <code>True</code> or <code>False</code>.<br><span class="es">Verdadero o falso.</span></td><td><code>x &lt; 10</code></td></tr>
+<tr><td><strong>Counter variable</strong><br><span class="es">Variable contador</span></td><td>Tracks loop iterations.<br><span class="es">Registra las iteraciones.</span></td><td><code>i</code> in <code>for i in range(5)</code></td></tr>
+<tr><td><strong>Infinite loop</strong><br><span class="es">Bucle infinito</span></td><td>A loop that never stops.<br><span class="es">Un bucle que nunca para.</span></td><td>Forgetting to update the counter</td></tr>
+<tr><td><strong><code>range()</code></strong></td><td>Generates a number sequence.<br><span class="es">Genera una secuencia.</span></td><td><code>range(0, 10, 2)</code> → 0,2,4,6,8</td></tr>
+</tbody></table>
+</section>
+<hr class="divider">
+
+<!-- §2 WHILE LOOP -->
+<section data-section="2">
+<div class="section-header while"><h2>Section 2: Meet the <code>while</code> Loop</h2><div class="bilingual">Sección 2: Conoce el Bucle while</div></div>
+<p class="text-block">A <code>while</code> loop keeps running <strong>as long as a condition is True</strong>.</p>
+<p class="text-block es">Un bucle while sigue corriendo mientras una condición sea verdadera.</p>
+<div class="callout" data-icon="💡"><div class="callout-title">Pattern / Patrón</div>
+<p class="text-block" style="margin:0">Every <code>while</code> loop needs: (1) starting value, (2) condition, (3) update. Forget #3 → infinite loop.</p></div>
+
+<div class="checkpoint">✏️ Trace 1 of 6</div>
+<p class="text-block"><strong>Read first. Do NOT run yet.</strong></p>
+<div class="code-label">📋 Code Block A <span class="copy-hint">Read → Predict → Run</span></div>
+<div class="code-display"><div><span class="ln">1</span><span class="var">count</span> = <span class="num">1</span></div><div><span class="ln">2</span><span class="kw">while</span> <span class="var">count</span> &lt;= <span class="num">5</span>:</div><div><span class="ln">3</span>    <span class="fn">print</span>(<span class="var">count</span>)</div><div><span class="ln">4</span>    <span class="var">count</span> = <span class="var">count</span> + <span class="num">1</span></div></div>
+<div class="predict-box"><div class="predict-label">🔮 PREDICT: What will this print?</div><div class="predict-sub">PREDICE — Write your prediction BEFORE running.</div><textarea placeholder="Write each output value..."></textarea></div>
+
+<div class="trinket-wrapper">
+  <div class="trinket-label"><span class="trinket-dot"></span> Run it / Córrelo — Code Block A</div>
+  <!-- ⚠️ TEACHER: Replace the src URL below with your Trinket embed URL for Code Block A -->
+  <!-- Create at trinket.io/python3 → paste the code → Share → Embed → copy the URL -->
+<iframe src="https://trinket.io/embed/python/2548e63d83ba" width="100%" height="600" frameborder="0" marginwidth="0" marginheight="0" allowfullscreen></iframe>
+  <div class="trinket-setup">Trinket setup: count = 1 → while count <= 5: print(count), count = count + 1</div>
+</div>
+<div class="reveal-section"><button class="reveal-btn" onclick="toggleReveal(this)">Show explanation / Mostrar explicación</button><div class="reveal-content"><p><strong>Output:</strong> 1, 2, 3, 4, 5</p><p>count starts at 1. Each pass: print, add 1. At 6, <code>6 &lt;= 5</code> is False → stops.</p><p class="es">count empieza en 1. Cuando llega a 6, la condición es falsa → para.</p></div></div>
+
+<div class="checkpoint">✏️ Trace 2 of 6</div>
+<div class="code-label">📋 Code Block B</div>
+<div class="code-display"><div><span class="ln">1</span><span class="var">x</span> = <span class="num">10</span></div><div><span class="ln">2</span><span class="kw">while</span> <span class="var">x</span> > <span class="num">0</span>:</div><div><span class="ln">3</span>    <span class="fn">print</span>(<span class="var">x</span>)</div><div><span class="ln">4</span>    <span class="var">x</span> = <span class="var">x</span> - <span class="num">3</span></div></div>
+<div class="predict-box"><div class="predict-label">🔮 PREDICT: What numbers will print?</div><textarea placeholder="List each number..."></textarea></div>
+
+<div class="trinket-wrapper">
+  <div class="trinket-label"><span class="trinket-dot"></span> Run it / Córrelo — Code Block B</div>
+  <!-- ⚠️ TEACHER: Replace the src URL below with your Trinket embed URL for Code Block B -->
+<iframe src="https://trinket.io/embed/python/4021566a90cd" width="100%" height="600" frameborder="0" marginwidth="0" marginheight="0" allowfullscreen></iframe>
+  <div class="trinket-setup">Trinket setup: x = 10 → while x > 0: print(x), x = x - 3</div>
+</div>
+<div class="reveal-section"><button class="reveal-btn" onclick="toggleReveal(this)">Show explanation / Mostrar explicación</button><div class="reveal-content"><p><strong>Output:</strong> 10, 7, 4, 1</p><p>Trace: 10→7→4→1→-2. At -2, condition is False.</p></div></div>
+</section>
+<hr class="divider">
+
+<!-- §3 FOR LOOP -->
+<section data-section="3">
+<div class="section-header for"><h2>Section 3: Meet the <code>for</code> Loop</h2><div class="bilingual">Sección 3: Conoce el Bucle for</div></div>
+<p class="text-block">A <code>for</code> loop runs a <strong>specific number of times</strong>. <code>range()</code> controls start, stop, step.</p>
+<div class="callout" data-icon="📐"><div class="callout-title">range() Cheat Sheet</div>
+<p class="text-block" style="margin:0"><code>range(5)</code> → 0,1,2,3,4<br><code>range(2,8)</code> → 2,3,4,5,6,7<br><code>range(0,20,5)</code> → 0,5,10,15<br><code>range(10,0,-2)</code> → 10,8,6,4,2</p></div>
+
+<div class="checkpoint">✏️ Trace 3 of 6</div>
+<div class="code-label">📋 Code Block C</div>
+<div class="code-display"><div><span class="ln">1</span><span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="num">5</span>):</div><div><span class="ln">2</span>    <span class="fn">print</span>(<span class="var">i</span>)</div></div>
+<div class="predict-box"><div class="predict-label">🔮 PREDICT: What prints? How many lines?</div><textarea placeholder="Your prediction..."></textarea></div>
+
+<div class="trinket-wrapper">
+  <div class="trinket-label"><span class="trinket-dot"></span> Run it / Córrelo — Code Block C</div>
+  <!-- ⚠️ TEACHER: Replace the src URL below with your Trinket embed URL for Code Block C -->
+  <!-- Create at trinket.io/python3 → paste the code → Share → Embed → copy the URL -->
+<iframe src="https://trinket.io/embed/python/d7c1116c131e" width="100%" height="600" frameborder="0" marginwidth="0" marginheight="0" allowfullscreen></iframe>
+  <div class="trinket-setup">Trinket setup: for i in range(5): print(i)</div>
+</div>
+<div class="reveal-section"><button class="reveal-btn" onclick="toggleReveal(this)">Show explanation / Mostrar explicación</button><div class="reveal-content"><p><strong>Output:</strong> 0,1,2,3,4 (5 lines). range(5) stops <em>before</em> 5.</p></div></div>
+
+<div class="checkpoint">✏️ Trace 4 of 6</div>
+<div class="code-label">📋 Code Block D</div>
+<div class="code-display"><div><span class="ln">1</span><span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="num">10</span>, <span class="num">101</span>, <span class="num">10</span>):</div><div><span class="ln">2</span>    <span class="fn">print</span>(<span class="var">i</span>)</div></div>
+<div class="predict-box"><div class="predict-label">🔮 PREDICT: First number? Last?</div><textarea placeholder="First: ___ Last: ___"></textarea></div>
+
+<div class="trinket-wrapper">
+  <div class="trinket-label"><span class="trinket-dot"></span> Run it / Córrelo — Code Block D</div>
+  <!-- ⚠️ TEACHER: Replace the src URL below with your Trinket embed URL for Code Block D -->
+  <!-- Create at trinket.io/python3 → paste the code → Share → Embed → copy the URL -->
+<iframe src="https://trinket.io/embed/python/6f803997f77b" width="100%" height="600" frameborder="0" marginwidth="0" marginheight="0" allowfullscreen></iframe>
+  <div class="trinket-setup">Trinket setup: for i in range(10, 101, 10): print(i)</div>
+</div>
+<div class="reveal-section"><button class="reveal-btn" onclick="toggleReveal(this)">Show explanation / Mostrar explicación</button><div class="reveal-content"><p><strong>Output:</strong> 10,20,30,...,100. Stop is 101 so 100 is included.</p></div></div>
+</section>
+<hr class="divider">
+
+<!-- §4 SIDE-BY-SIDE -->
+<section data-section="4">
+<div class="section-header compare"><h2>Section 4: Same Output, Two Loops</h2><div class="bilingual">Sección 4: Misma Salida, Dos Bucles</div></div>
+<div class="comparison">
+<div class="col while-col"><h3>while version</h3><div class="code-display" style="border:none;margin:0;padding:.8rem"><div><span class="var">i</span> = <span class="num">0</span></div><div><span class="kw">while</span> <span class="var">i</span> &lt; <span class="num">5</span>:</div><div>    <span class="fn">print</span>(<span class="var">i</span>)</div><div>    <span class="var">i</span> = <span class="var">i</span> + <span class="num">1</span></div></div></div>
+<div class="col for-col"><h3>for version</h3><div class="code-display" style="border:none;margin:0;padding:.8rem"><div><span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="num">5</span>):</div><div>    <span class="fn">print</span>(<span class="var">i</span>)</div></div></div>
+</div>
+<div class="callout" data-icon="🔑"><div class="callout-title">Key Difference / Diferencia Clave</div>
+<p class="text-block" style="margin:0"><code>for</code> handles the counter automatically. <code>while</code> requires you to manage all three steps.</p></div>
+
+<p class="text-block">Harder — both count down from 10 to 2 by twos:</p>
+<div class="comparison">
+<div class="col while-col"><h3>while countdown</h3><div class="code-display" style="border:none;margin:0;padding:.8rem"><div><span class="var">num</span> = <span class="num">10</span></div><div><span class="kw">while</span> <span class="var">num</span> >= <span class="num">2</span>:</div><div>    <span class="fn">print</span>(<span class="var">num</span>)</div><div>    <span class="var">num</span> = <span class="var">num</span> - <span class="num">2</span></div></div></div>
+<div class="col for-col"><h3>for countdown</h3><div class="code-display" style="border:none;margin:0;padding:.8rem"><div><span class="kw">for</span> <span class="var">num</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="num">10</span>, <span class="num">0</span>, <span class="num">-2</span>):</div><div>    <span class="fn">print</span>(<span class="var">num</span>)</div></div></div>
+</div>
+<div class="checkpoint">✏️ Trace 5 of 6</div>
+<div class="predict-box"><div class="predict-label">🔮 PREDICT: Identical output?</div><textarea placeholder="Yes/No and why..."></textarea></div>
+
+<div class="trinket-wrapper">
+  <div class="trinket-label"><span class="trinket-dot"></span> Run it / Córrelo — Code Block E</div>
+  <!-- ⚠️ TEACHER: Replace the src URL below with your Trinket embed URL for Code Block E -->
+  <!-- Create at trinket.io/python3 → paste the code → Share → Embed → copy the URL -->
+<iframe src="https://trinket.io/embed/python/cb65c78d1a74" width="100%" height="600" frameborder="0" marginwidth="0" marginheight="0" allowfullscreen></iframe>
+  <div class="trinket-setup">Trinket setup: Both countdown versions side-by-side (paste while version first, then for version)</div>
+</div>
+<div class="reveal-section"><button class="reveal-btn" onclick="toggleReveal(this)">Show explanation / Mostrar explicación</button><div class="reveal-content"><p>Both: 10,8,6,4,2. They match here. Change while to <code>> 2</code> instead of <code>>= 2</code> and they'd diverge.</p></div></div>
+</section>
+<hr class="divider">
+
+<!-- §5 WHEN TO USE WHICH -->
+<section data-section="5">
+<div class="section-header compare"><h2>Section 5: When to Use Which?</h2><div class="bilingual">Sección 5: ¿Cuándo Usar Cuál?</div></div>
+<div class="comparison">
+<div class="col while-col"><h3>Use while when...</h3><p style="font-size:.88rem">You <strong>don't know</strong> how many times. Depends on input or a changing condition.</p><p class="es" style="font-size:.82rem;margin-top:.3rem">Usa while cuando no sabes cuántas veces.</p></div>
+<div class="col for-col"><h3>Use for when...</h3><p style="font-size:.88rem">You <strong>know exactly</strong> how many times, or you're counting through a range.</p><p class="es" style="font-size:.82rem;margin-top:.3rem">Usa for cuando sabes exactamente.</p></div>
+</div>
+</section>
+<hr class="divider">
+
+<!-- §6 INFINITE LOOPS -->
+<section data-section="6">
+<div class="section-header while"><h2>Section 6: Spot the Danger — Infinite Loops</h2><div class="bilingual">Sección 6: Detecta el Peligro</div></div>
+<div class="checkpoint">✏️ Trace 6 of 6</div>
+<p class="text-block"><strong>Find the problem BEFORE running.</strong> ⚠️ This WILL freeze if you run it as-is.</p>
+<div class="code-label">📋 Code Block F — ⚠️ DANGEROUS</div>
+<div class="code-display"><div><span class="ln">1</span><span class="var">count</span> = <span class="num">1</span></div><div><span class="ln">2</span><span class="kw">while</span> <span class="var">count</span> &lt;= <span class="num">10</span>:</div><div><span class="ln">3</span>    <span class="fn">print</span>(<span class="var">count</span>)</div></div>
+<div class="predict-box"><div class="predict-label">🔮 What will happen? What's missing?</div><textarea placeholder="The bug is..."></textarea></div>
+<div class="reveal-section"><button class="reveal-btn" onclick="toggleReveal(this)">Show explanation / Mostrar explicación</button><div class="reveal-content"><p><strong>Infinite loop!</strong> Nothing changes count. Fix: add <code>count = count + 1</code>.</p></div></div>
+<div class="callout" data-icon="⚠️"><div class="callout-title">Why for loops are safer</div><p class="text-block" style="margin:0">You <strong>cannot</strong> create an infinite loop with <code>for</code> + <code>range()</code>.</p></div>
+</section>
+<hr class="divider">
+
+<!-- §7 CHALLENGES -->
+<section data-section="7">
+<div class="section-header compare"><h2>Section 7: Build It Yourself</h2><div class="bilingual">Sección 7: Constrúyelo Tú Mismo</div></div>
+
+<div class="callout" data-icon="🅰️"><div class="callout-title">Challenge A</div>
+<p class="text-block" style="margin:0">Print every <strong>odd number from 1 to 19</strong>.</p>
+<p class="text-block es" style="margin:.2rem 0 0">Imprime cada número impar del 1 al 19.</p></div>
+
+<div class="trinket-wrapper">
+  <div class="trinket-label"><span class="trinket-dot"></span> Run it / Córrelo — Code Block G</div>
+  <!-- ⚠️ TEACHER: Replace the src URL below with your Trinket embed URL for Code Block G -->
+  <!-- Create at trinket.io/python3 → paste the code → Share → Embed → copy the URL -->
+<iframe src="https://trinket.io/embed/python/342df814b2c8" width="100%" height="600" frameborder="0" marginwidth="0" marginheight="0" allowfullscreen></iframe>
+  <div class="trinket-setup">Trinket setup: Empty — student writes: for i in range(1, 20, 2): print(i)</div>
+</div>
+<div class="reveal-section"><button class="reveal-btn" onclick="toggleReveal(this)">Show solution</button><div class="reveal-content"><div class="code-display"><div><span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, <span class="num">20</span>, <span class="num">2</span>):</div><div>    <span class="fn">print</span>(<span class="var">i</span>)</div></div></div></div>
+
+<div class="callout" data-icon="🅱️"><div class="callout-title">Challenge B</div>
+<p class="text-block" style="margin:0">Ask user to type <code>"yes"</code> to continue. Keep asking until they do.</p></div>
+
+<div class="trinket-wrapper">
+  <div class="trinket-label"><span class="trinket-dot"></span> Run it / Córrelo — Code Block H</div>
+  <!-- ⚠️ TEACHER: Replace the src URL below with your Trinket embed URL for Code Block H -->
+  <!-- Create at trinket.io/python3 → paste the code → Share → Embed → copy the URL -->
+<iframe src="https://trinket.io/embed/python/342df814b2c8" width="100%" height="600" frameborder="0" marginwidth="0" marginheight="0" allowfullscreen></iframe>
+  <div class="trinket-setup">Trinket setup: Empty — student writes: while/input loop</div>
+</div>
+<div class="reveal-section"><button class="reveal-btn" onclick="toggleReveal(this)">Show solution</button><div class="reveal-content"><div class="code-display"><div><span class="var">answer</span> = <span class="str">""</span></div><div><span class="kw">while</span> <span class="var">answer</span> != <span class="str">"yes"</span>:</div><div>    <span class="var">answer</span> = <span class="fn">input</span>(<span class="str">"Type yes to continue: "</span>)</div><div><span class="fn">print</span>(<span class="str">"Let's go!"</span>)</div></div></div></div>
+
+<div class="callout" data-icon="🏆"><div class="callout-title">Bonus: Pattern Generation <span class="lg-tag lg1-tag" style="margin-left:.5rem;vertical-align:middle">LG1</span></div>
+<p class="text-block" style="margin:0">Generate this pattern with a <code>for</code> loop:</p>
+<div class="code-display" style="margin:.4rem 0;line-height:1.3"><div>*</div><div>**</div><div>***</div><div>****</div><div>*****</div></div>
+<p class="text-block es" style="margin:.2rem 0 0">Pista: <code>print("*" * i)</code></p></div>
+
+<div class="trinket-wrapper">
+  <div class="trinket-label"><span class="trinket-dot"></span> Run it / Córrelo — Code Block I</div>
+  <!-- ⚠️ TEACHER: Replace the src URL below with your Trinket embed URL for Code Block I -->
+  <!-- Create at trinket.io/python3 → paste the code → Share → Embed → copy the URL -->
+<iframe src="https://trinket.io/embed/python/342df814b2c8" width="100%" height="600" frameborder="0" marginwidth="0" marginheight="0" allowfullscreen></iframe>
+  <div class="trinket-setup">Trinket setup: Empty — student writes: for i in range(1, 6): print('*' * i)</div>
+</div>
+<div class="reveal-section"><button class="reveal-btn" onclick="toggleReveal(this)">Show solution</button><div class="reveal-content"><div class="code-display"><div><span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, <span class="num">6</span>):</div><div>    <span class="fn">print</span>(<span class="str">"*"</span> * <span class="var">i</span>)</div></div></div></div>
+</section>
+
+<div class="footer-nav">
+  <p><strong>Next:</strong> Lesson 2 — Loop Tracing Challenge (C Day, 45 min)</p>
+  <p style="margin-top:.3rem">📌 Complete all 6 traces + 3 challenges before moving on.</p>
+</div>
+
+</div>
+
+<script>
+function toggleReveal(btn){const c=btn.nextElementSibling;c.classList.toggle('visible');if(!btn.dataset.o)btn.dataset.o=btn.textContent;btn.textContent=c.classList.contains('visible')?'Hide / Ocultar':btn.dataset.o}
+function selectChoice(el,cls){el.parentElement.querySelectorAll('.choice-btn').forEach(b=>{b.className='choice-btn'});el.classList.add(cls)}
+const sections=document.querySelectorAll('section[data-section]'),steps=document.querySelectorAll('.progress-bar .step');let mx=0;
+const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){const i=parseInt(e.target.dataset.section)-1;if(i>mx)mx=i;steps.forEach((s,j)=>{s.className='step';if(j<mx)s.classList.add('done');else if(j===mx)s.classList.add('active')})}})},{threshold:.3});
+sections.forEach(s=>obs.observe(s));
+</script>
+</body>
+</html>
