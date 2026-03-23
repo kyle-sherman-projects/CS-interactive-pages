@@ -1,0 +1,1466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Functions & Parameters 2 — AP CSP</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #22263a;
+    --border: #2e3347;
+    --accent: #4f8ef7;
+    --accent2: #7c5cfc;
+    --green: #2dce89;
+    --yellow: #f5a623;
+    --red: #f55f5f;
+    --text: #e8eaf0;
+    --muted: #8890a8;
+    --code-bg: #111420;
+    --tag-bg: #1f2235;
+    --dadi-d: #4f8ef7;
+    --dadi-a: #7c5cfc;
+    --dadi-d2: #2dce89;
+    --dadi-i: #f5a623;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .lesson-header {
+    background: linear-gradient(135deg, #1a1d27 0%, #0f1117 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 24px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .lesson-title h1 {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.1rem;
+    color: var(--accent);
+    letter-spacing: 0.02em;
+  }
+
+  .lesson-title p {
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .progress-bar-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .progress-bar {
+    width: 180px;
+    height: 6px;
+    background: var(--surface2);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 99px;
+    transition: width 0.5s ease;
+    width: 0%;
+  }
+
+  .progress-label {
+    font-size: 0.78rem;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* SECTION NAVIGATION */
+  .section-nav {
+    display: flex;
+    gap: 6px;
+    padding: 16px 32px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .section-nav::-webkit-scrollbar { display: none; }
+
+  .nav-pill {
+    padding: 6px 14px;
+    border-radius: 99px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    white-space: nowrap;
+    transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .nav-pill.active {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+  }
+
+  .nav-pill.done {
+    border-color: var(--green);
+    color: var(--green);
+  }
+
+  /* MAIN LAYOUT */
+  .main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 32px 24px 80px;
+  }
+
+  /* SECTION */
+  .section {
+    display: none;
+  }
+
+  .section.active {
+    display: block;
+    animation: fadeUp 0.3s ease;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* CARDS */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px;
+    margin-bottom: 20px;
+  }
+
+  .card-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-title .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .section-heading {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    line-height: 1.2;
+  }
+
+  .section-sub {
+    font-size: 0.95rem;
+    color: var(--muted);
+    margin-bottom: 28px;
+  }
+
+  /* TIMER BADGE */
+  .timer-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--tag-bg);
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    padding: 3px 12px;
+    font-size: 0.78rem;
+    color: var(--yellow);
+    font-family: 'Space Mono', monospace;
+    margin-bottom: 20px;
+  }
+
+  /* BILINGUAL VOCAB */
+  .vocab-strip {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent2);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+  }
+
+  .vocab-strip h3 {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent2);
+    margin-bottom: 12px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .vocab-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+  }
+
+  .vocab-item {
+    background: var(--surface);
+    border-radius: 8px;
+    padding: 10px 14px;
+  }
+
+  .vocab-en {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--accent);
+  }
+
+  .vocab-es {
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-top: 2px;
+    font-style: italic;
+  }
+
+  .vocab-def {
+    font-size: 0.78rem;
+    color: var(--text);
+    margin-top: 4px;
+    line-height: 1.4;
+  }
+
+  /* ANALOGY BUILDER */
+  .analogy-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+
+  @media (max-width: 600px) {
+    .analogy-grid { grid-template-columns: 1fr; }
+  }
+
+  .analogy-example {
+    background: var(--surface2);
+    border-radius: 10px;
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+
+  .analogy-example:hover {
+    border-color: var(--accent);
+  }
+
+  .analogy-example.selected {
+    border-color: var(--accent);
+    background: rgba(79, 142, 247, 0.08);
+  }
+
+  .analogy-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--yellow);
+    margin-bottom: 6px;
+  }
+
+  .analogy-example p {
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+
+  .text-input {
+    width: 100%;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    resize: vertical;
+    min-height: 90px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .text-input:focus {
+    border-color: var(--accent);
+  }
+
+  .text-input::placeholder {
+    color: var(--muted);
+  }
+
+  .input-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  .sentence-frame {
+    background: rgba(79, 142, 247, 0.07);
+    border: 1px dashed rgba(79, 142, 247, 0.4);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.88rem;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+
+  .sentence-frame strong {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.82rem;
+  }
+
+  /* CODE BLOCKS */
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    overflow-x: auto;
+    line-height: 1.7;
+    margin-bottom: 14px;
+  }
+
+  .kw { color: #c792ea; }
+  .fn { color: #82aaff; }
+  .param { color: #7bc67e; }
+  .num { color: #f78c6c; }
+  .comment { color: #546e7a; font-style: italic; }
+  .call { color: #ffcb6b; }
+
+  /* CODE TRACE */
+  .trace-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 16px;
+    background: var(--surface2);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    border: 1px solid var(--border);
+    transition: border-color 0.2s;
+  }
+
+  .trace-step.highlight {
+    border-color: var(--yellow);
+    background: rgba(245, 166, 35, 0.06);
+  }
+
+  .step-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    color: var(--muted);
+  }
+
+  .step-content {
+    flex: 1;
+  }
+
+  .step-code {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+
+  .step-explain {
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  .step-explain.es {
+    color: #7c8aaa;
+    font-style: italic;
+    font-size: 0.8rem;
+  }
+
+  /* PREDICT QUIZ */
+  .predict-box {
+    background: var(--surface2);
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+
+  .predict-question {
+    font-size: 0.92rem;
+    font-weight: 600;
+    margin-bottom: 14px;
+  }
+
+  .predict-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .predict-option {
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    background: var(--surface);
+    color: var(--text);
+    text-align: left;
+    transition: all 0.15s;
+  }
+
+  .predict-option:hover {
+    border-color: var(--accent);
+    background: rgba(79, 142, 247, 0.07);
+  }
+
+  .predict-option.correct {
+    border-color: var(--green) !important;
+    background: rgba(45, 206, 137, 0.1) !important;
+    color: var(--green);
+  }
+
+  .predict-option.wrong {
+    border-color: var(--red) !important;
+    background: rgba(245, 95, 95, 0.08) !important;
+    color: var(--red);
+  }
+
+  .feedback-box {
+    display: none;
+    margin-top: 12px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+
+  .feedback-box.show { display: block; }
+
+  .feedback-box.correct-fb {
+    background: rgba(45, 206, 137, 0.1);
+    border: 1px solid rgba(45, 206, 137, 0.3);
+    color: var(--green);
+  }
+
+  .feedback-box.wrong-fb {
+    background: rgba(245, 95, 95, 0.08);
+    border: 1px solid rgba(245, 95, 95, 0.3);
+    color: var(--red);
+  }
+
+  /* DADI SCAFFOLD */
+  .dadi-bar {
+    display: flex;
+    gap: 0;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    border: 1px solid var(--border);
+  }
+
+  .dadi-step {
+    flex: 1;
+    padding: 10px 12px;
+    text-align: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    opacity: 0.5;
+  }
+
+  .dadi-step.active-dadi { opacity: 1; }
+
+  .dadi-step:nth-child(1) { background: rgba(79, 142, 247, 0.18); color: var(--dadi-d); }
+  .dadi-step:nth-child(2) { background: rgba(124, 92, 252, 0.18); color: var(--dadi-a); }
+  .dadi-step:nth-child(3) { background: rgba(45, 206, 137, 0.18); color: var(--dadi-d2); }
+  .dadi-step:nth-child(4) { background: rgba(245, 166, 35, 0.18); color: var(--dadi-i); }
+
+  /* PRACTICE BUILDER */
+  .practice-problem {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px;
+    margin-bottom: 16px;
+  }
+
+  .practice-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .difficulty-tag {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 99px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .diff-guided { background: rgba(79, 142, 247, 0.15); color: var(--accent); }
+  .diff-standard { background: rgba(124, 92, 252, 0.15); color: var(--accent2); }
+  .diff-challenge { background: rgba(245, 166, 35, 0.15); color: var(--yellow); }
+
+  .problem-prompt {
+    font-size: 0.95rem;
+    margin-bottom: 14px;
+    line-height: 1.6;
+  }
+
+  .problem-prompt .es {
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-style: italic;
+    display: block;
+    margin-top: 2px;
+  }
+
+  .scaffold-hint {
+    background: rgba(79, 142, 247, 0.06);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    padding: 10px 14px;
+    margin-bottom: 14px;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  .scaffold-hint strong {
+    color: var(--accent);
+    display: block;
+    margin-bottom: 3px;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .code-editor {
+    width: 100%;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    color: #a8b4d0;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    resize: vertical;
+    min-height: 120px;
+    outline: none;
+    line-height: 1.7;
+    transition: border-color 0.2s;
+  }
+
+  .code-editor:focus { border-color: var(--accent); }
+
+  /* BUTTONS */
+  .btn {
+    padding: 10px 22px;
+    border-radius: 99px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background: #3a7cf5;
+    transform: translateY(-1px);
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+  }
+
+  .btn-ghost:hover {
+    background: rgba(79, 142, 247, 0.1);
+  }
+
+  .btn-green {
+    background: var(--green);
+    color: #0a1a0e;
+  }
+
+  .btn-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 28px;
+    justify-content: space-between;
+  }
+
+  /* REVIEW TABLE */
+  .review-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    margin-bottom: 16px;
+  }
+
+  .review-table th {
+    background: var(--surface2);
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .review-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  .review-table tr:last-child td { border-bottom: none; }
+
+  .review-table td:first-child {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.82rem;
+    color: var(--accent);
+    width: 45%;
+  }
+
+  /* EXIT TICKET */
+  .exit-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  @media (max-width: 600px) {
+    .exit-grid { grid-template-columns: 1fr; }
+  }
+
+  .exit-card {
+    background: var(--surface2);
+    border-radius: 12px;
+    padding: 18px;
+    border: 1px solid var(--border);
+  }
+
+  .exit-card h4 {
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  /* SUCCESS BANNER */
+  .success-banner {
+    background: linear-gradient(135deg, rgba(45, 206, 137, 0.15), rgba(45, 206, 137, 0.05));
+    border: 1px solid rgba(45, 206, 137, 0.3);
+    border-radius: 14px;
+    padding: 28px;
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  .success-banner .icon {
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+  }
+
+  .success-banner h2 {
+    font-size: 1.4rem;
+    color: var(--green);
+    margin-bottom: 8px;
+  }
+
+  .success-banner p {
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+
+  /* DIVIDER */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 24px 0;
+  }
+
+  /* INLINE HIGHLIGHT */
+  .hl { color: var(--yellow); font-weight: 600; }
+  .hl-blue { color: var(--accent); font-weight: 600; }
+  .hl-green { color: var(--green); font-weight: 600; }
+
+  /* SCORE TRACKER */
+  .score-bar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 12px 16px;
+    background: var(--surface2);
+    border-radius: 10px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border);
+    font-size: 0.85rem;
+  }
+
+  .score-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--border);
+    flex-shrink: 0;
+    transition: background 0.3s;
+  }
+
+  .score-dot.correct { background: var(--green); }
+  .score-dot.wrong { background: var(--red); }
+
+  .score-text {
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.78rem;
+    margin-left: auto;
+  }
+
+  /* ANALOGY DISPLAY */
+  .analogy-display {
+    background: var(--surface2);
+    border-radius: 10px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    margin-top: 14px;
+    font-size: 0.9rem;
+    display: none;
+  }
+
+  .analogy-display.show { display: block; animation: fadeUp 0.3s ease; }
+
+  .check-mark { color: var(--green); font-size: 1.2rem; margin-right: 6px; }
+
+</style>
+</head>
+<body>
+
+<header class="lesson-header">
+  <div class="lesson-title">
+    <h1>Functions &amp; Parameters 2</h1>
+    <p>AP Computer Science Principles · 80-min Block · Lesson 2 of 3</p>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <span class="progress-label" id="progressLabel">0 / 4</span>
+  </div>
+</header>
+
+<nav class="section-nav" id="sectionNav">
+  <button class="nav-pill active" onclick="goSection(0)">① Do Now</button>
+  <button class="nav-pill" onclick="goSection(1)">② Review</button>
+  <button class="nav-pill" onclick="goSection(2)">③ Code Trace</button>
+  <button class="nav-pill" onclick="goSection(3)">④ Practice</button>
+  <button class="nav-pill" onclick="goSection(4)">⑤ Exit Ticket</button>
+</nav>
+
+<main class="main">
+
+  <!-- ═══════════════════════════════════════════
+       SECTION 0: DO NOW
+  ════════════════════════════════════════════ -->
+  <div class="section active" id="sec-0">
+
+    <div class="timer-badge">⏱ 5–7 min · Individual or Pair</div>
+    <h2 class="section-heading">Do Now: Analogy Builder</h2>
+    <p class="section-sub">Make a connection — functions and parameters are everywhere in real life.</p>
+
+    <div class="vocab-strip">
+      <h3>📚 Key Vocabulary / Vocabulario Clave</h3>
+      <div class="vocab-grid">
+        <div class="vocab-item">
+          <div class="vocab-en">Function</div>
+          <div class="vocab-es">Función</div>
+          <div class="vocab-def">A named set of instructions that runs when called</div>
+        </div>
+        <div class="vocab-item">
+          <div class="vocab-en">Parameter</div>
+          <div class="vocab-es">Parámetro</div>
+          <div class="vocab-def">A variable that receives an input value when a function is called</div>
+        </div>
+        <div class="vocab-item">
+          <div class="vocab-en">Argument</div>
+          <div class="vocab-es">Argumento</div>
+          <div class="vocab-def">The actual value passed into a function</div>
+        </div>
+        <div class="vocab-item">
+          <div class="vocab-en">Multiple Parameters</div>
+          <div class="vocab-es">Múltiples parámetros</div>
+          <div class="vocab-def">Two or more inputs a function can accept</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--yellow)"></span>Example Analogies — click one to get started</div>
+      <div class="analogy-grid" id="analogyGrid">
+        <div class="analogy-example" onclick="selectAnalogy(this, 'recipe')">
+          <div class="analogy-label">🍳 Example 1</div>
+          <p><strong>Recipe &amp; Ingredients</strong> — A recipe is the function. Ingredients like flour, sugar, and eggs are the parameters. Each time you bake, you plug in specific amounts (arguments).</p>
+        </div>
+        <div class="analogy-example" onclick="selectAnalogy(this, 'math')">
+          <div class="analogy-label">📐 Example 2</div>
+          <p><strong>Math Formula</strong> — Area = length × width. The formula is the function; length and width are parameters. You plug in any numbers to calculate.</p>
+        </div>
+        <div class="analogy-example" onclick="selectAnalogy(this, 'music')">
+          <div class="analogy-label">🎵 Example 3</div>
+          <p><strong>Song &amp; Lyrics</strong> — A song structure is the function. The lyrics (words, tempo, key) are parameters. Same structure, different inputs = different songs.</p>
+        </div>
+        <div class="analogy-example" onclick="selectAnalogy(this, 'order')">
+          <div class="analogy-label">🌮 Example 4</div>
+          <p><strong>Restaurant Order</strong> — Ordering food is the function. Your choices (protein, toppings, size) are the parameters. The kitchen runs the same process with your custom inputs.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--accent)"></span>Your Turn — Create Your Own Analogy</div>
+
+      <div class="sentence-frame">
+        <strong>Sentence Frame / Marco de oración:</strong><br>
+        "A __________ is like a function because __________.
+        The parameters are __________ because __________."
+      </div>
+
+      <label class="input-label" for="analogyInput">Write your analogy here:</label>
+      <textarea class="text-input" id="analogyInput" placeholder="For example: A vending machine is like a function because... The parameters are the button you press and the money you put in because..."></textarea>
+
+      <br><br>
+
+      <label class="input-label" for="analogyQ1">❓ Discussion Question: Why are parameters useful? What would happen without them?</label>
+      <textarea class="text-input" id="analogyQ1" placeholder="Write your thinking here..."></textarea>
+
+      <div class="analogy-display" id="analogyDisplay">
+        <span class="check-mark">✔</span> <strong>Saved!</strong> You can review your analogy later in the Exit Ticket.
+      </div>
+    </div>
+
+    <div class="btn-nav">
+      <span></span>
+      <button class="btn btn-primary" onclick="saveDoNow()">Save &amp; Continue →</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SECTION 1: REVIEW
+  ════════════════════════════════════════════ -->
+  <div class="section" id="sec-1">
+
+    <div class="timer-badge">⏱ 5 min · Review</div>
+    <h2 class="section-heading">Review: Single Parameters</h2>
+    <p class="section-sub">Before we go further — let's confirm what we already know.</p>
+
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--accent)"></span>Function Anatomy — Review</div>
+
+      <pre><span class="kw">def</span> <span class="fn">double_number</span>(<span class="param">x</span>):        <span class="comment"># x is the PARAMETER</span>
+    double_x = <span class="num">2</span> * <span class="param">x</span>
+    print(double_x)
+
+<span class="call">double_number</span>(<span class="num">10</span>)    <span class="comment"># 10 is the ARGUMENT → x gets the value 10</span></pre>
+
+      <table class="review-table">
+        <thead>
+          <tr><th>Term / Término</th><th>What it is</th><th>In the code above</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>def function_name(parameter):</td>
+            <td>Defines a function; the variable inside () is the parameter</td>
+            <td><code style="color:var(--accent);font-family:'Space Mono',monospace;font-size:0.82rem">def double_number(x):</code></td>
+          </tr>
+          <tr>
+            <td>function_name(argument)</td>
+            <td>Calls the function; the value inside () is the argument</td>
+            <td><code style="color:var(--yellow);font-family:'Space Mono',monospace;font-size:0.82rem">double_number(10)</code></td>
+          </tr>
+          <tr>
+            <td>Parameter variable</td>
+            <td>Gets its value from the argument at call time</td>
+            <td><code style="color:var(--green);font-family:'Space Mono',monospace;font-size:0.82rem">x = 10</code> (inside the function)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--yellow)"></span>The Problem: What if we need more than one input?</div>
+      <p style="margin-bottom:14px;line-height:1.7">Think back to our recipe analogy. A recipe for cookies doesn't just need <span class="hl-blue">flour</span> — it also needs <span class="hl">sugar</span>, <span class="hl-green">eggs</span>, and more.</p>
+      <p style="line-height:1.7">A function that only accepts <strong>one</strong> parameter is limited. In today's lesson, we'll learn how Python lets us pass <strong>multiple inputs</strong> into a single function.</p>
+
+      <hr class="divider">
+
+      <p style="font-size:0.88rem;color:var(--muted)">
+        <em>En español: Hoy aprenderemos cómo una función puede recibir <strong>múltiples parámetros</strong> — no solo uno.</em>
+      </p>
+    </div>
+
+    <div class="btn-nav">
+      <button class="btn btn-ghost" onclick="goSection(0)">← Back</button>
+      <button class="btn btn-primary" onclick="goSection(2)">Next: Code Trace →</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SECTION 2: CODE TRACE
+  ════════════════════════════════════════════ -->
+  <div class="section" id="sec-2">
+
+    <div class="timer-badge">⏱ 12–15 min · Predict &amp; Check</div>
+    <h2 class="section-heading">Code Trace: Predict the Output</h2>
+    <p class="section-sub">Read the code carefully. Predict what it prints — then check yourself.</p>
+
+    <div class="score-bar">
+      <div class="score-dot" id="dot0"></div>
+      <div class="score-dot" id="dot1"></div>
+      <div class="score-dot" id="dot2"></div>
+      <div class="score-dot" id="dot3"></div>
+      <span class="score-text" id="scoreText">0 / 4 correct</span>
+    </div>
+
+    <!-- Q1 -->
+    <div class="predict-box">
+      <div class="card-title" style="margin-bottom:10px"><span class="dot" style="background:var(--accent)"></span>Question 1 of 4</div>
+      <pre><span class="kw">def</span> <span class="fn">print_a_number</span>(<span class="param">num</span>):
+    print(<span class="param">num</span>)
+
+<span class="call">print_a_number</span>(<span class="num">10</span>)
+<span class="call">print_a_number</span>(<span class="num">20</span>)
+<span class="call">print_a_number</span>(<span class="num">30</span>)</pre>
+      <div class="predict-question">What does this code output?</div>
+      <div class="predict-options">
+        <button class="predict-option" onclick="checkAnswer(0, this, false)">10 20 30 (on one line)</button>
+        <button class="predict-option" onclick="checkAnswer(0, this, true)">10<br>20<br>30 (each on a new line)</button>
+        <button class="predict-option" onclick="checkAnswer(0, this, false)">num num num</button>
+        <button class="predict-option" onclick="checkAnswer(0, this, false)">Error — num not defined</button>
+      </div>
+      <div class="feedback-box" id="fb-0"></div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="predict-box">
+      <div class="card-title" style="margin-bottom:10px"><span class="dot" style="background:var(--accent2)"></span>Question 2 of 4 — Multiple Parameters</div>
+      <pre><span class="kw">def</span> <span class="fn">print_sum</span>(<span class="param">first</span>, <span class="param">second</span>):
+    print(<span class="param">first</span> + <span class="param">second</span>)
+
+<span class="call">print_sum</span>(<span class="num">5</span>, <span class="num">6</span>)</pre>
+      <div class="predict-question">What does this code output?</div>
+      <div class="predict-options">
+        <button class="predict-option" onclick="checkAnswer(1, this, false)">56</button>
+        <button class="predict-option" onclick="checkAnswer(1, this, true)">11</button>
+        <button class="predict-option" onclick="checkAnswer(1, this, false)">first + second</button>
+        <button class="predict-option" onclick="checkAnswer(1, this, false)">Error</button>
+      </div>
+      <div class="feedback-box" id="fb-1"></div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="predict-box">
+      <div class="card-title" style="margin-bottom:10px"><span class="dot" style="background:var(--green)"></span>Question 3 of 4 — Default Parameters</div>
+      <pre><span class="kw">def</span> <span class="fn">print_sum</span>(<span class="param">first</span>, <span class="param">second</span>=<span class="num">20</span>):
+    print(<span class="param">first</span> + <span class="param">second</span>)
+
+<span class="call">print_sum</span>(<span class="num">10</span>)
+<span class="call">print_sum</span>(<span class="num">20</span>, <span class="num">30</span>)
+<span class="call">print_sum</span>(<span class="num">30</span>, <span class="num">40</span>)</pre>
+      <div class="predict-question">What does this code output?</div>
+      <div class="predict-options">
+        <button class="predict-option" onclick="checkAnswer(2, this, false)">10<br>50<br>70</button>
+        <button class="predict-option" onclick="checkAnswer(2, this, false)">20<br>50<br>70</button>
+        <button class="predict-option" onclick="checkAnswer(2, this, true)">30<br>50<br>70</button>
+        <button class="predict-option" onclick="checkAnswer(2, this, false)">Error — missing argument</button>
+      </div>
+      <div class="feedback-box" id="fb-2"></div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="predict-box">
+      <div class="card-title" style="margin-bottom:10px"><span class="dot" style="background:var(--yellow)"></span>Question 4 of 4 — Error Check</div>
+      <pre><span class="kw">def</span> <span class="fn">print_sum</span>(<span class="param" style="background:rgba(245,95,95,0.15);padding:1px 4px;border-radius:3px">first=10</span>, <span class="param">second</span>):
+    print(<span class="param">first</span> + <span class="param">second</span>)</pre>
+      <div class="predict-question">What happens when Python runs this code?</div>
+      <div class="predict-options">
+        <button class="predict-option" onclick="checkAnswer(3, this, false)">It runs normally</button>
+        <button class="predict-option" onclick="checkAnswer(3, this, true)">SyntaxError — default parameters must come last</button>
+        <button class="predict-option" onclick="checkAnswer(3, this, false)">It prints 10</button>
+        <button class="predict-option" onclick="checkAnswer(3, this, false)">It ignores the default value</button>
+      </div>
+      <div class="feedback-box" id="fb-3"></div>
+    </div>
+
+    <!-- Step-by-step trace -->
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--green)"></span>Step-by-Step: How Python Reads a Multi-Parameter Call</div>
+      <pre><span class="kw">def</span> <span class="fn">print_sum</span>(<span class="param">first</span>, <span class="param">second</span>):
+    print(<span class="param">first</span> + <span class="param">second</span>)
+
+<span class="call">print_sum</span>(<span class="num">5</span>, <span class="num">6</span>)</pre>
+
+      <div class="trace-step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-code">def print_sum(first, second):</div>
+          <div class="step-explain">Python reads the definition — it knows this function needs TWO inputs.</div>
+          <div class="step-explain es">Python lee la definición — sabe que esta función necesita DOS entradas.</div>
+        </div>
+      </div>
+      <div class="trace-step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-code">print_sum(5, 6)</div>
+          <div class="step-explain">Python calls the function. It matches arguments to parameters in order: first=5, second=6.</div>
+          <div class="step-explain es">Python llama la función. Empareja argumentos con parámetros en orden: first=5, second=6.</div>
+        </div>
+      </div>
+      <div class="trace-step highlight">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-code">print(first + second) → print(5 + 6) → 11</div>
+          <div class="step-explain">Inside the function, first=5 and second=6, so 5+6 = 11 is printed.</div>
+          <div class="step-explain es">Dentro de la función, first=5 y second=6, entonces 5+6 = 11 se imprime.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-nav">
+      <button class="btn btn-ghost" onclick="goSection(1)">← Back</button>
+      <button class="btn btn-primary" onclick="goSection(3)">Next: Practice →</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SECTION 3: GUIDED PRACTICE
+  ════════════════════════════════════════════ -->
+  <div class="section" id="sec-3">
+
+    <div class="timer-badge">⏱ 25–30 min · Individual or Pair</div>
+    <h2 class="section-heading">Guided Practice</h2>
+    <p class="section-sub">Apply what you've learned. Choose your level — all paths cover the same skills.</p>
+
+    <!-- DADI Bar -->
+    <div class="dadi-bar">
+      <div class="dadi-step active-dadi">D<br><span style="font-size:0.6rem;opacity:0.8">Deconstruct</span></div>
+      <div class="dadi-step active-dadi">A<br><span style="font-size:0.6rem;opacity:0.8">Analyze</span></div>
+      <div class="dadi-step active-dadi">D<br><span style="font-size:0.6rem;opacity:0.8">Design</span></div>
+      <div class="dadi-step active-dadi">I<br><span style="font-size:0.6rem;opacity:0.8">Implement</span></div>
+    </div>
+
+    <!-- Problem 1: Guided -->
+    <div class="practice-problem">
+      <div class="practice-header">
+        <strong>Problem 1</strong>
+        <span class="difficulty-tag diff-guided">🔵 Guided</span>
+      </div>
+      <div class="problem-prompt">
+        Write a function called <code style="color:var(--accent);font-family:'Space Mono',monospace">greet_student</code> that takes two parameters: <code style="color:var(--green);font-family:'Space Mono',monospace">first_name</code> and <code style="color:var(--green);font-family:'Space Mono',monospace">last_name</code>. It should print: <code style="font-family:'Space Mono',monospace;color:var(--yellow)">Hello, [first] [last]!</code>
+        <span class="es">Escribe una función llamada greet_student que tome dos parámetros: first_name y last_name.</span>
+      </div>
+      <div class="scaffold-hint">
+        <strong>🧩 Scaffold / Andamiaje</strong>
+        Fill in the blanks:<br>
+        <code style="font-family:'Space Mono',monospace;color:var(--muted)">def greet_student(________, ________):
+    print("Hello, " + ________ + " " + ________ + "!")</code>
+      </div>
+      <textarea class="code-editor" id="p1code" placeholder="# Write your code here
+def greet_student(first_name, last_name):
+    print(...)
+
+greet_student('Maria', 'Lopez')"></textarea>
+    </div>
+
+    <!-- Problem 2: Standard -->
+    <div class="practice-problem">
+      <div class="practice-header">
+        <strong>Problem 2</strong>
+        <span class="difficulty-tag diff-standard">🟣 Standard</span>
+      </div>
+      <div class="problem-prompt">
+        Write a function called <code style="color:var(--accent);font-family:'Space Mono',monospace">calculate_area</code> that takes <code style="color:var(--green);font-family:'Space Mono',monospace">length</code> and <code style="color:var(--green);font-family:'Space Mono',monospace">width</code> as parameters and prints the area (length × width). Then call it three times with different values.
+        <span class="es">Escribe una función que calcule el área. Llámala tres veces con diferentes valores.</span>
+      </div>
+      <div class="scaffold-hint">
+        <strong>🧩 DADI Hint — Analyze</strong>
+        What are the inputs? What is the output? What formula do you need?
+      </div>
+      <textarea class="code-editor" id="p2code" placeholder="# Your function here
+def calculate_area(...):
+    ...
+
+# Call it 3 times
+calculate_area(...)
+calculate_area(...)
+calculate_area(...)"></textarea>
+    </div>
+
+    <!-- Problem 3: Challenge -->
+    <div class="practice-problem">
+      <div class="practice-header">
+        <strong>Problem 3</strong>
+        <span class="difficulty-tag diff-challenge">⭐ Challenge</span>
+      </div>
+      <div class="problem-prompt">
+        Write a function called <code style="color:var(--accent);font-family:'Space Mono',monospace">describe_student</code> with three parameters: <code style="color:var(--green);font-family:'Space Mono',monospace">name</code>, <code style="color:var(--green);font-family:'Space Mono',monospace">grade</code>, and <code style="color:var(--green);font-family:'Space Mono',monospace">favorite_subject</code>. Give <code>favorite_subject</code> a default value of <code style="color:var(--yellow);font-family:'Space Mono',monospace">"Computer Science"</code>. Call it twice — once with all three arguments, once with only two.
+        <span class="es">Reto: Escribe una función con un valor predeterminado (default value). Llámala de dos maneras diferentes.</span>
+      </div>
+      <div class="scaffold-hint">
+        <strong>🧩 Reminder: Default Parameter Rule</strong>
+        Default parameters must come <em>last</em> in the parameter list. Place them after required parameters.
+      </div>
+      <textarea class="code-editor" id="p3code" placeholder="# Challenge: function with a default parameter
+def describe_student(name, grade, favorite_subject='Computer Science'):
+    ...
+
+describe_student('Alex', 11, 'Math')   # all 3 args
+describe_student('Sam', 10)             # only 2 args — uses default"></textarea>
+    </div>
+
+    <!-- Reflection -->
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--accent2)"></span>Quick Reflection</div>
+      <label class="input-label" for="reflectInput">What's one thing that was confusing or surprising about multiple parameters?</label>
+      <textarea class="text-input" id="reflectInput" placeholder="Write your reflection here..."></textarea>
+    </div>
+
+    <div class="btn-nav">
+      <button class="btn btn-ghost" onclick="goSection(2)">← Back</button>
+      <button class="btn btn-primary" onclick="goSection(4)">Next: Exit Ticket →</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SECTION 4: EXIT TICKET
+  ════════════════════════════════════════════ -->
+  <div class="section" id="sec-4">
+
+    <div class="timer-badge">⏱ 8–10 min · Individual</div>
+    <h2 class="section-heading">Exit Ticket</h2>
+    <p class="section-sub">Show what you know. Your teacher will use this to plan the next lesson.</p>
+
+    <!-- Name field -->
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--accent)"></span>Your Name</div>
+      <label class="input-label" for="et-name">First and Last Name <span style="color:var(--red)">*</span></label>
+      <input type="text" class="text-input" id="et-name" placeholder="e.g. Maria Lopez" style="min-height:unset;height:44px;resize:none" oninput="this.style.borderColor=''">
+    </div>
+
+    <!-- Review your analogy -->
+    <div class="card" id="analogyReviewCard">
+      <div class="card-title"><span class="dot" style="background:var(--yellow)"></span>Your Do Now Analogy</div>
+      <div id="analogyReviewText" style="font-size:0.9rem;color:var(--muted);font-style:italic">No analogy saved — that's okay, write your answer below.</div>
+    </div>
+
+    <div class="exit-grid">
+      <div class="exit-card">
+        <h4>1 — I can explain…</h4>
+        <textarea class="text-input" id="et1" placeholder="Explain in your own words: What is a parameter? How is it different from an argument?&#10;&#10;En tus propias palabras: ¿Qué es un parámetro? ¿En qué se diferencia de un argumento?" style="min-height:130px"></textarea>
+      </div>
+      <div class="exit-card">
+        <h4>2 — I can trace…</h4>
+        <pre style="font-size:0.78rem;margin-bottom:10px"><span class="kw">def</span> <span class="fn">add</span>(<span class="param">a</span>, <span class="param">b</span>, <span class="param">c</span>=<span class="num">5</span>):
+    print(<span class="param">a</span> + <span class="param">b</span> + <span class="param">c</span>)
+
+<span class="call">add</span>(<span class="num">1</span>, <span class="num">2</span>)
+<span class="call">add</span>(<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>)</pre>
+        <textarea class="text-input" id="et2" placeholder="What does this print? Show your work.&#10;Output line 1: ___&#10;Output line 2: ___" style="min-height:80px"></textarea>
+      </div>
+      <div class="exit-card">
+        <h4>3 — I still have questions about…</h4>
+        <textarea class="text-input" id="et3" placeholder="What's still unclear? It's okay to be honest — this helps your teacher plan!&#10;&#10;¿Qué todavía no está claro?" style="min-height:130px"></textarea>
+      </div>
+      <div class="exit-card">
+        <h4>4 — Connection to AP CSP</h4>
+        <textarea class="text-input" id="et4" placeholder="How does using parameters connect to the idea of 'abstraction' in computer science? (Think: reusability, generalization)" style="min-height:130px"></textarea>
+      </div>
+    </div>
+
+    <br>
+
+    <div style="text-align:center">
+      <button class="btn btn-green" onclick="submitExitTicket()" style="font-size:1rem;padding:14px 36px">✔ Submit Exit Ticket → Google Form</button>
+    </div>
+
+    <div id="successDiv" style="display:none">
+      <br>
+      <div class="success-banner">
+        <div class="icon">🎉</div>
+        <h2>Lesson Complete!</h2>
+        <p>A Google Form just opened in a new tab with your answers pre-filled. <strong>Click Submit on that form</strong> to send your responses to your teacher.</p>
+        <br>
+        <p style="font-size:0.82rem;color:var(--accent)"><strong>Before next class:</strong> Watch the CodeHS video for the next lesson and complete the warm-up on CodeHS.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="dot" style="background:var(--green)"></span>What We Learned Today</div>
+        <table class="review-table">
+          <thead><tr><th>Concept</th><th>Example</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>Multiple parameters</td>
+              <td><code style="font-family:'Space Mono',monospace;font-size:0.8rem;color:var(--accent)">def f(a, b): ...</code></td>
+            </tr>
+            <tr>
+              <td>Calling with multiple args</td>
+              <td><code style="font-family:'Space Mono',monospace;font-size:0.8rem;color:var(--yellow)">f(5, 6)</code></td>
+            </tr>
+            <tr>
+              <td>Default parameter values</td>
+              <td><code style="font-family:'Space Mono',monospace;font-size:0.8rem;color:var(--green)">def f(a, b=10): ...</code></td>
+            </tr>
+            <tr>
+              <td>Default params come last</td>
+              <td><code style="font-family:'Space Mono',monospace;font-size:0.8rem;color:var(--red)">def f(a=1, b): ← ERROR</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="btn-nav">
+      <button class="btn btn-ghost" onclick="goSection(3)">← Back</button>
+      <span></span>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  // ── State ──────────────────────────────────────
+  let currentSection = 0;
+  const totalSections = 5;
+  const completedSections = new Set([0]); // do now is auto-active
+  let scores = [null, null, null, null];
+  let correctCount = 0;
+
+  const feedbacks = [
+    {
+      correct: "✔ Correct! print() always outputs on a new line by default. Each call to print_a_number() prints one number.",
+      wrong: "Not quite. Remember: print() adds a newline after each call. Three separate calls = three separate lines."
+    },
+    {
+      correct: "✔ Correct! first=5, second=6, so 5+6=11 is printed.",
+      wrong: "Look again. first gets the value 5, second gets the value 6. What is 5+6?"
+    },
+    {
+      correct: "✔ Correct! When print_sum(10) is called with only one argument, second uses its default value of 20. So 10+20=30. The other calls override the default.",
+      wrong: "Remember: print_sum(10) uses the default value second=20, so first+second = 10+20 = 30."
+    },
+    {
+      correct: "✔ Correct! Python requires that parameters with default values always come after parameters without defaults. This is a SyntaxError.",
+      wrong: "Python actually raises a SyntaxError here. Default parameters must be listed last. 'first=10' cannot come before 'second' (which has no default)."
+    }
+  ];
+
+  // ── Navigation ────────────────────────────────
+  function goSection(n) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById('sec-' + n).classList.add('active');
+    currentSection = n;
+    updateNav();
+    updateProgress();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function updateNav() {
+    const pills = document.querySelectorAll('.nav-pill');
+    pills.forEach((pill, i) => {
+      pill.classList.remove('active', 'done');
+      if (i === currentSection) pill.classList.add('active');
+      else if (completedSections.has(i) && i !== currentSection) pill.classList.add('done');
+    });
+  }
+
+  function updateProgress() {
+    const done = completedSections.size;
+    const pct = Math.round((done / totalSections) * 100);
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressLabel').textContent = done + ' / ' + totalSections;
+  }
+
+  // ── Do Now ────────────────────────────────────
+  function selectAnalogy(el, key) {
+    document.querySelectorAll('.analogy-example').forEach(e => e.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  function saveDoNow() {
+    const analogyText = document.getElementById('analogyInput').value.trim();
+    if (analogyText.length < 5) {
+      document.getElementById('analogyInput').style.borderColor = 'var(--red)';
+      document.getElementById('analogyInput').placeholder = 'Please write your analogy before continuing...';
+      setTimeout(() => {
+        document.getElementById('analogyInput').style.borderColor = '';
+      }, 2000);
+      return;
+    }
+    document.getElementById('analogyDisplay').classList.add('show');
+    completedSections.add(0);
+    completedSections.add(1);
+    goSection(1);
+  }
+
+  // ── Code Trace ───────────────────────────────
+  function checkAnswer(qIndex, btn, isCorrect) {
+    const container = btn.parentElement;
+    const allBtns = container.querySelectorAll('.predict-option');
+    const fb = document.getElementById('fb-' + qIndex);
+
+    if (container.dataset.answered) return;
+    container.dataset.answered = 'true';
+
+    allBtns.forEach(b => {
+      b.style.pointerEvents = 'none';
+    });
+
+    if (isCorrect) {
+      btn.classList.add('correct');
+      fb.textContent = feedbacks[qIndex].correct;
+      fb.className = 'feedback-box show correct-fb';
+      if (scores[qIndex] === null) {
+        scores[qIndex] = true;
+        correctCount++;
+        document.getElementById('dot' + qIndex).classList.add('correct');
+      }
+    } else {
+      btn.classList.add('wrong');
+      fb.textContent = feedbacks[qIndex].wrong;
+      fb.className = 'feedback-box show wrong-fb';
+      if (scores[qIndex] === null) {
+        scores[qIndex] = false;
+        document.getElementById('dot' + qIndex).classList.add('wrong');
+        // reveal correct
+        allBtns.forEach(b => {
+          const handler = b.getAttribute('onclick');
+          if (handler && handler.includes('true')) b.classList.add('correct');
+        });
+      }
+    }
+
+    document.getElementById('scoreText').textContent = correctCount + ' / 4 correct';
+    completedSections.add(2);
+    updateProgress();
+    updateNav();
+  }
+
+  // ── Exit Ticket ───────────────────────────────
+  function submitExitTicket() {
+    // Validate name field
+    const nameVal = document.getElementById('et-name').value.trim();
+    if (!nameVal) {
+      document.getElementById('et-name').style.borderColor = 'var(--red)';
+      document.getElementById('et-name').focus();
+      return;
+    }
+
+    const analogySaved = document.getElementById('analogyInput').value.trim();
+    const reviewEl = document.getElementById('analogyReviewText');
+    if (analogySaved) {
+      reviewEl.style.color = 'var(--text)';
+      reviewEl.style.fontStyle = 'normal';
+      reviewEl.textContent = '"' + analogySaved + '"';
+    }
+
+    // Collect responses
+    const name  = nameVal;
+    const q1    = document.getElementById('et1').value.trim();
+    const q2    = document.getElementById('et2').value.trim();
+    const q3    = document.getElementById('et3').value.trim();
+    const q4    = document.getElementById('et4').value.trim();
+
+    // Build pre-filled Google Form URL
+    const base = 'https://docs.google.com/forms/d/e/1FAIpQLSfwM4VJqESB_UZJFtxMbOaOLtoYyJ-lx3EMqB05WhKFpFU_AA/viewform?usp=pp_url';
+    const url  = base
+      + '&entry.1625087094=' + encodeURIComponent(name)
+      + '&entry.183193522='  + encodeURIComponent(q1)
+      + '&entry.1519757600=' + encodeURIComponent(q2)
+      + '&entry.1229016669=' + encodeURIComponent(q3)
+      + '&entry.931857359='  + encodeURIComponent(q4);
+
+    // Open form in new tab — student clicks Submit there
+    window.open(url, '_blank');
+
+    completedSections.add(3);
+    completedSections.add(4);
+    updateProgress();
+    updateNav();
+    document.getElementById('successDiv').style.display = 'block';
+    document.getElementById('successDiv').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  // Init
+  updateProgress();
+</script>
+
+</body>
+</html>
